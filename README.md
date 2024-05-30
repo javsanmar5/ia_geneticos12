@@ -12,10 +12,10 @@ Grupo: geneticos12
 Sigue estos pasos para probar el repositorio
 
 1. **Clonar el Repositorio**:
-    - Proporciona el comando `git clone` con la URL del repositorio y el comando `cd` para entrar en el directorio clonado.
+    - Ejecuta el comando `git clone` con la URL del repositorio y el comando `cd` para entrar en el directorio clonado.
 
 ```sh
-git clone https://github.com/javsanmar5/trabajo_ia.git
+git clone https://github.com/javsanmar5/ia_geneticos12.git
 cd trabajo_ia
 ```
 

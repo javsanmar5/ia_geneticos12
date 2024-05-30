@@ -7,8 +7,8 @@ from ag.AG import AG
 # Nombre generico del dataset
 nombre_dataset = 'housing'
 
-nombre_dataset_train = nombre_dataset+"_train.csv"
-nombre_dataset_val = nombre_dataset+"_val.csv"
+nombre_dataset_train 	= nombre_dataset + "_train.csv"
+nombre_dataset_val 		= nombre_dataset + "_val.csv"
 
 # La clase AG debe estar implementada	
 # (importe los ficheros necesarios antes de ejecutar las siguientes lineas)
@@ -22,7 +22,7 @@ ag = AG(
 	# numero de individuos
 	nInd = 50, 
 	# maximo de iteraciones
-	maxIter = 100 
+	maxIter = 100,
 )
 
 if __name__ == '__main__':

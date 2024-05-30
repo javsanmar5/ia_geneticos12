@@ -23,7 +23,7 @@ class AbstractChromosome(ABC):
 
         :param self: Cromosoma al que se le aplica el cruce  
         :param to_cross_with: Cromosoma con el que se cruza 
-        :return: Lista de cromosomas cruzados
+        :return: Lista de cromosomas hijos cruzados con la información de los padres
         '''
         pass
 

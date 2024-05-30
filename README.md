@@ -52,12 +52,12 @@ Podemos utilizar un entorno virtual o el entorno de *Python* instalado en su equ
 
         - Lanzarlo por defecto: Por defecto se ejecutará el fichero de prueba *housing*. Si se quiere modificar se podrá modificar manualmente en el fichero.
             ```sh
-            python src/test/prueba_AG.py
+            python src/prueba_AG.py
             ```
 
         - Pasar el nombre del fichero como parametro. Por defecto: *housing*. 
             ```sh
-            python src/test/prueba_AG.py nombre_fichero
+            python src/prueba_AG.py nombre_fichero
             ```
 
     En ambos casos las opciones de fichero son: *housing, synt1 y toy1*

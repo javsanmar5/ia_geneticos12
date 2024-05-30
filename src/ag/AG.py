@@ -1,8 +1,7 @@
 # Trabajo realizado por: Javier Ruíz, Javier Santos 
 
 from chromosomes.AbstractChromosome import AbstractChromosome 
-from chromosomes.HousingChromosome import HousingChromosome
-from chromosomes.Synt1Chromosome import Synt1Chromosome
+from chromosomes.HousingChromosome import Chromosome
 from ag.csv_reader import *
 
 from typing import List, Tuple # Ayudas para documentacion
@@ -13,6 +12,7 @@ class AG():
     def __init__(self, datos_train: str, datos_test: str, 
                     seed: int, nInd: int, maxIter: int,
                     mutation_rate: float = 0.01,
+                    cross_rate: float = 0.8,
                     elitism_rate: float = 0.2,
                     selection_method: str = "elitism") -> None:
         
@@ -26,6 +26,7 @@ class AG():
         self.max_iterations:        int = maxIter
 
         self.mutation_rate:         float = mutation_rate
+        self.cross_rate:            float = cross_rate
         self.elitism_rate:          float = elitism_rate
         self.selection_method:      str = selection_method
 
@@ -110,7 +111,9 @@ class AG():
             best_fitness = self.population[0].fitness()
             print(f'Generation {generation}: Best Fitness = {best_fitness}')
 
-        return max(self.population, key=lambda chromo: chromo.fitness())
+        testeo = aux()
+
+        return max(self.population, key=lambda chromo: chromo.fitness()), testeo
 
     def tournament_selection(self, k: int = 3) -> AbstractChromosome:
         '''
@@ -124,3 +127,7 @@ class AG():
         tournament = random.sample(self.population, k)
         tournament.sort(key=lambda chromo: chromo.fitness(), reverse=True)
         return tournament[0]
+    
+
+    def aux(): 
+        pass

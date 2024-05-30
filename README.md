@@ -16,7 +16,7 @@ Sigue estos pasos para probar el repositorio
 
 ```sh
 git clone https://github.com/javsanmar5/ia_geneticos12.git
-cd trabajo_ia
+cd ia_geneticos12
 ```
 
 ### Ahora existen dos alternativas:

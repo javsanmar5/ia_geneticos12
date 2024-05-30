@@ -22,7 +22,7 @@ class Chromosome(AbstractChromosome):
         self.target:    float           = target
 
         if chromosome is None:
-            self.chromosome: List[float]= [random.uniform(-3, 3) for _ in range(2 * len(features))]
+            self.chromosome: List[float]= [random.uniform(-3,3) for _ in range(2 * len(features))]
         else:
             self.chromosome: List[float]= chromosome
         
@@ -34,8 +34,11 @@ class Chromosome(AbstractChromosome):
         # en este caso, la diferencia entre target y predicted al cuadrado.
         
         predicted:  float = self.__predict()
+        # print(f"{self.target} -> {predicted}")
+        
         error:      float = (self.target - predicted) ** 2 
 
+        # print(1 / error)
         return 1 / error
 
     def __predict(self) -> float:
@@ -51,8 +54,12 @@ class Chromosome(AbstractChromosome):
         prediction: float = 0.
 
         for i in range(len(self.features)):
-            prediction += self.chromosome[2*i] * (self.features[i] ** self.chromosome[2*i + 1])
 
+            while type(self.features[i] ** self.chromosome[2*i + 1]) == complex:
+                self.chromosome[2*i + 1] *= random.random() # Puede ser que no funcione por esto
+                
+            prediction += self.chromosome[2*i] * (self.features[i] ** self.chromosome[2*i + 1])
+            
         return prediction
     
         # OPCION 2
@@ -61,8 +68,8 @@ class Chromosome(AbstractChromosome):
     
 
 
-    def crossover(self, cross_rate: float, 
-                  chromosomeToCrossWith: 'HousingChromosome') -> List['HousingChromosome']:
+    def crossover(self, chromosomeToCrossWith: 'Chromosome', 
+                  cross_rate: float,) -> List['Chromosome']:
         # La idea es mezclar dos cromosomas dados, eligiendo 
         # el punto de cruce de manera aleatoria.
         # Una vez escogemos el punto, creamos dos hijos eligiendo
@@ -76,13 +83,13 @@ class Chromosome(AbstractChromosome):
         if random.random() > cross_rate:
             return [self, chromosomeToCrossWith]
 
-        point = random.randint(1, len(self.choromosomes) - 1) # Escogemos el punto de cruce
+        point = random.randint(1, len(self.chromosome) - 1) # Escogemos el punto de cruce
 
         child1_chromosomes = self.chromosome[:point] + chromosomeToCrossWith.chromosome[point:]
         child2_chromosomes = chromosomeToCrossWith.chromosome[:point] + self.chromosome[point:]
         
-        return [HousingChromosome(self.features, self.target, child1_chromosomes),
-                HousingChromosome(chromosomeToCrossWith.features, chromosomeToCrossWith.target, child2_chromosomes)]
+        return [Chromosome(self.features, self.target, child1_chromosomes),
+                Chromosome(chromosomeToCrossWith.features, chromosomeToCrossWith.target, child2_chromosomes)]
 
 
     def mutate(self, mutation_rate: float) -> None:

@@ -1,7 +1,6 @@
 # Trabajo realizado por: Javier Ruíz, Javier Santos 
 
-from chromosomes.AbstractChromosome import AbstractChromosome 
-from chromosomes.HousingChromosome import Chromosome
+from chromosomes.Chromosome import Chromosome
 from ag.csv_reader import *
 
 from typing import List, Tuple # Ayudas para documentacion
@@ -17,11 +16,10 @@ class AG():
                     selection_method: str = "elitism") -> None:
         
         random.seed(seed) # Generamos los números aleatorios con la semilla dada
-        train_chromosomes = read_data(datos_train)
 
         # Asignamos las variables
-        self.train_data:            str = datos_train
-        self.test_data:             str = datos_test
+        self.train_data:            str = read_data(datos_train)
+        self.test_data:             str = read_data(datos_test)
         self.population_size:       int = nInd
         self.max_iterations:        int = maxIter
 
@@ -30,8 +28,8 @@ class AG():
         self.elitism_rate:          float = elitism_rate
         self.selection_method:      str = selection_method
 
-        self.population: List[AbstractChromosome] = random.sample(
-            train_chromosomes, self.population_size)
+        self.population: List[Chromosome] = random.sample(
+            self.train_data, self.population_size)
 
 
     #     self.population: List[AbstractChromosome] = self.initialize_population(
@@ -55,7 +53,7 @@ class AG():
         
     #     return [chromosome_class(args) for _ in range(self.population_size)]
 
-    def run(self) -> AbstractChromosome:
+    def run(self) -> Chromosome:
         '''
         Ejecuta el algoritmo genético y devuelve el cromosoma con la mejor aptitud encontrada después de todas las iteraciones.
 
@@ -78,7 +76,7 @@ class AG():
                     #Asigna a parent1 y parent2 los dos cromosomas ganadores del torneo
                     parent1, parent2 = self.tournament_selection(), self.tournament_selection()
                     #Se genera el cruce entra ambos padres, offspring contiene dos cromosomas hijos
-                    offspring = parent1.crossover(parent2)
+                    offspring = parent1.crossover(parent2, self.cross_rate)
                     for child in offspring:
                         if len(next_generation) < self.population_size: 
                             #Para cada hijo, se somete a la probabilidad de ser mutado
@@ -93,7 +91,7 @@ class AG():
                     #Asigna a parent1 y parent2 los dos cromosomas ganadores del torneo
                     parent1, parent2 = self.tournament_selection(), self.tournament_selection()
                     #Se genera el cruce entra ambos padres, offspring contiene dos cromosomas hijos
-                    offspring = parent1.crossover(parent2)
+                    offspring = parent1.crossover(parent2, self.cross_rate)
                     for child in offspring:
                         #Para cada hijo, se somete a la probabilidad de ser mutado
                         child.mutate(self.mutation_rate)
@@ -111,17 +109,16 @@ class AG():
             best_fitness = self.population[0].fitness()
             print(f'Generation {generation}: Best Fitness = {best_fitness}')
 
-        testeo = aux()
+        winner_chromosome = max(self.population, key=lambda chromo: chromo.fitness())
+        return winner_chromosome, self.test(winner_chromosome)
 
-        return max(self.population, key=lambda chromo: chromo.fitness()), testeo
-
-    def tournament_selection(self, k: int = 3) -> AbstractChromosome:
+    def tournament_selection(self, k: int = 3) -> Chromosome:
         '''
         Toma una muestra aleatoria de k cromosomas de la poblacion y devuelve el cromosoma con la mejor aptitud
         
         :param self: Instancia de la clase AG
         :param k: Numero de cromosomas elegidos para el torneo, por defecto es 3.
-        :return: Cromosoma con la mejor aptitud, de tipo AbstractChromosome.
+        :return: Cromosoma con la mejor aptitud, de tipo Chromosome.
         '''
 
         tournament = random.sample(self.population, k)
@@ -129,5 +126,12 @@ class AG():
         return tournament[0]
     
 
-    def aux(): 
-        pass
+    def test(self, chromosome: Chromosome) -> List[float]:
+        
+        results = []
+        for datum in self.test_data:
+            y_pred = sum(chromosome.chromosome[2*i] * (datum.features[i] ** 
+                        chromosome.chromosome[2*i + 1]) for i in range(len(datum.features)))
+            results.append(y_pred)
+        
+        return results

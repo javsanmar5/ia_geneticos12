@@ -1,10 +1,9 @@
-from chromosomes.HousingChromosome import HousingChromosome
-from chromosomes.AbstractChromosome import AbstractChromosome
+from chromosomes.Chromosome import Chromosome
 from typing import List
 
 import os
 
-def read_data(filepath: str) -> List[AbstractChromosome]:
+def read_data(filepath: str) -> List[Chromosome]:
     '''
     Lee el fichero csv y lo convierte en una lista de cromosomas
     
@@ -18,20 +17,14 @@ def read_data(filepath: str) -> List[AbstractChromosome]:
     data_dir = os.path.abspath(os.path.join(current_dir, '..', '..', 'data'))
 
     if 'housing' in filepath:
-        full_filepath = os.path.join(data_dir, 'housing_data', filepath)
-        return read_housing_data(full_filepath)
+        full_filepath = os.path.join(data_dir, filepath)
     elif 'synt1' in filepath:
-        full_filepath = os.path.join(data_dir, 'synt1_data', filepath)
-        pass
+        full_filepath = os.path.join(data_dir, filepath)
     elif 'toy1' in filepath:
-        full_filepath = os.path.join(data_dir, 'toy1_data', filepath)
+        full_filepath = os.path.join(data_dir, filepath)
         pass
     else: # default
         raise ValueError("No existen esos datos de prueba.")
-
-
-
-def read_housing_data(full_filepath: str) -> List[HousingChromosome]:
     
     with open(full_filepath, 'r') as file:
         
@@ -42,12 +35,6 @@ def read_housing_data(full_filepath: str) -> List[HousingChromosome]:
             parts = list(map(float, line.strip().split(',')))
             features = parts[:-1]
             target = parts[-1]
-            chromosomes.append(HousingChromosome(features, target))
+            chromosomes.append(Chromosome(features, target))
             
     return chromosomes
-
-def read_synt1_data(filepath: str) -> List[str]: # Cambiar lo que devuelve a la lista correcta
-    pass
-
-def read_toy1_data(filepath: str) -> List[str]: # Cambiar lo que devuelve a la lista correcta
-    pass

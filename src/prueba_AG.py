@@ -7,8 +7,8 @@ from ag.AG import AG
 # Nombre generico del dataset
 nombre_dataset = 'housing'
 
-nombre_dataset_train 	= nombre_dataset + "_train.csv"
-nombre_dataset_val 		= nombre_dataset + "_val.csv"
+nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv"
+nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
 # La clase AG debe estar implementada	
 # (importe los ficheros necesarios antes de ejecutar las siguientes lineas)
@@ -20,39 +20,36 @@ ag = AG(
 	# semilla para numeros aleatorios
 	seed=123, 
 	# numero de individuos
-	nInd = 50, 
+	nInd = 100, 
 	# maximo de iteraciones
-	maxIter = 100,
+	maxIter = 3000
 )
 
 if __name__ == '__main__':
 	
-	algoritmo = ag.run()
-
-	print(f"features: {algoritmo.features}")
-	print(f"features: {algoritmo.target}")
+	# winner_chromosome, y_pred  = ag.run()
 
 
+    # Ejecucion del AG midiendo el tiempo
+	inicio = time.time()
+	ind, y_pred = ag.run()
+	fin = time.time()
+	print(f'Tiempo ejecucion: {(fin-inicio):.2f}')
 
-    # # Ejecucion del AG midiendo el tiempo
-	# inicio = time.time()
-	# ind, y_pred = ag.run()
-	# fin = time.time()
-	# print(f'Tiempo ejecucion: {(fin-inicio):.2f}')
+	# Imprimir mejor solución encontrada
+	print(f'Mejor individuo: {ind.chromosome}')
+	# 0.5*(a1^2) + -0.3*(a2^1) + ... + 10 # --> Se trata de un ejemplo
 
-	# # Imprimir mejor solución encontrada
-	# print(f'Mejor individuo: {ind}')
-	# # 0.5*(a1^2) + -0.3*(a2^1) + ... + 10 # --> Se trata de un ejemplo
+	# Imprimir predicciones sobre el conjunto de test
+	n = 10
+	print(f'{n} primeras predicciones: {y_pred[:n]}')
+	#  [-1.53, 1.49, 2.15, ..., -2.77] # --> Se trata de un ejemplo
 
-	# # Imprimir predicciones sobre el conjunto de test
-	# print(f'Predicciones: {y_pred}')
-	# #  [-1.53, 1.49, 2.15, ..., -2.77] # --> Se trata de un ejemplo
+	# Cargar valores reales de 'y' en el conjunto de validacion/test 
+	#   y calcular RMSE y R2 con las predicciones del AG
+	y_true = pd.read_csv("./data/" +  nombre_dataset_val)['y']
+	rmse = root_mean_squared_error(y_true, y_pred)
+	print(f'RMSE: {rmse:.4f}')
 
-	# # Cargar valores reales de 'y' en el conjunto de validacion/test 
-	# #   y calcular RMSE y R2 con las predicciones del AG
-	# y_true = pd.read_csv(nombre_dataset_val)['y']
-	# rmse = root_mean_squared_error(y_true, y_pred)
-	# print(f'RMSE: {rmse:.4f}')
-
-	# r2 = r2_score(y_true, y_pred)
-	# print(f'R2: {r2:.4f}')
+	r2 = r2_score(y_true, y_pred)
+	print(f'R2: {r2:.4f}')

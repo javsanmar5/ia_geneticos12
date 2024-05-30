@@ -2,6 +2,7 @@
 
 from chromosomes.AbstractChromosome import AbstractChromosome 
 from chromosomes.HousingChromosome import HousingChromosome
+from chromosomes.Synt1Chromosome import Synt1Chromosome
 from ag.csv_reader import *
 
 from typing import List, Tuple # Ayudas para documentacion
@@ -54,20 +55,28 @@ class AG():
     #     return [chromosome_class(args) for _ in range(self.population_size)]
 
     def run(self) -> AbstractChromosome:
+
+        #Cantidad de individuos que pasan directamente a la siguiente poblacion
         elitism_count = int(self.elitism_rate * self.population_size)
+ 
         for generation in range(self.max_iterations):
+            #Ordena la poblacion de cromosomas seleccionados segun la funcion de fitness
             self.population.sort(key=lambda chromo: chromo.fitness(), reverse=True)
             next_generation = []
 
             if self.selection_method == 'elitism':
+                #Añade en la siguiente generación los elitism_count elementos
                 next_generation = self.population[:elitism_count]
                 while len(next_generation) < self.population_size:
+                    #Asigna a parent1 y parent2 los dos cromosomas ganadores del torneo
                     parent1, parent2 = self.tournament_selection(), self.tournament_selection()
+                    #Se genera el cruce entra ambos padres, offspring contiene dos cromosomas hijos
                     offspring = parent1.crossover(parent2)
                     for child in offspring:
-                        if len(next_generation) < self.population_size:
+                        if len(next_generation) < self.population_size: 
                             child.mutate(self.mutation_rate)
                             next_generation.append(child)
+            
             
             elif self.selection_method == 'roulette':
                 combined_population = self.population[:]
@@ -81,6 +90,7 @@ class AG():
                 total_fitness = sum(fitness_values)
                 selection_probs = [fitness / total_fitness for fitness in fitness_values]
                 next_generation = random.choices(combined_population, weights=selection_probs, k=self.population_size)
+                
 
             self.population = next_generation
             best_fitness = self.population[0].fitness()
@@ -89,6 +99,14 @@ class AG():
         return max(self.population, key=lambda chromo: chromo.fitness())
 
     def tournament_selection(self, k: int = 3) -> AbstractChromosome:
+        '''
+        Toma una muestra aleatoria de k cromosomas de la poblacion y devuelve el cromosoma con la mejor aptitud
+        
+        :param self: Cromosoma a evaular
+        :param k: 
+        :return: Valoración del cromosoma, double.
+        '''
+
         tournament = random.sample(self.population, k)
         tournament.sort(key=lambda chromo: chromo.fitness(), reverse=True)
         return tournament[0]

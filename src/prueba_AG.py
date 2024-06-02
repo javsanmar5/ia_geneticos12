@@ -5,14 +5,14 @@ from sklearn.metrics import root_mean_squared_error, r2_score
 from ag.AG import AG
 
 # Nombre generico del dataset
-nombre_dataset = 'toy1'
+nombre_dataset = 'synt1'
 
 nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv"
 nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
 parameters = {
 	"housing": (20, 300),
-	"synt1": (20,50),
+	"synt1": (20,100),
 	"toy1": (200, 500)
 }
 

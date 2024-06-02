@@ -20,7 +20,7 @@ ag = AG(
 	# semilla para numeros aleatorios
 	seed=123, 
 	# numero de individuos
-	nInd = 150, 
+	nInd = 200, 
 	# maximo de iteraciones
 	maxIter = 500
 )
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
 	# Imprimir mejor solución encontrada
 	print(f'Coeficientes del mejor individuo: {ind.coefficients}')
-	print(f'Coeficientes del mejor individuo: {ind.exponents}')
+	print(f'Exponentes del mejor individuo: {ind.exponents}')
 	# 0.5*(a1^2) + -0.3*(a2^1) + ... + 10 # --> Se trata de un ejemplo
 
 	# Imprimir predicciones sobre el conjunto de test

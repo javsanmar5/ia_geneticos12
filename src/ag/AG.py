@@ -12,9 +12,9 @@ class AG():
     
     def __init__(self, datos_train: str, datos_test: str, 
                     seed: int, nInd: int, maxIter: int,
-                    mutation_rate: float = 0.06,
+                    mutation_rate: float = 0.25,
                     cross_rate: float = 0.7,
-                    elitism_rate: float = 0.3,
+                    elitism_rate: float = 0.2,
                     selection_method: str = "elitism") -> None:
         
         random.seed(seed) # Generamos los números aleatorios con la semilla dada
@@ -30,10 +30,11 @@ class AG():
         self.elitism_rate:          float = elitism_rate
         self.selection_method:      str = selection_method
 
-        self.population: List[Chromosome] = []
-        for i in range(self.population_size):
-            variables_amount = len(self.train_data[0]) - 1
-            self.population.append(Chromosome(variables_amount=variables_amount))
+        self.population: List[Chromosome] = [
+            [Chromosome(variables_amount=len(self.train_data[0]) - 1)]
+            for _ in range(self.population_size)
+        ]
+
 
 
     #     self.population: List[AbstractChromosome] = self.initialize_population(
@@ -67,25 +68,24 @@ class AG():
 
         #Cantidad de individuos que pasan directamente a la siguiente poblacion
         elitism_count = int(self.elitism_rate * self.population_size)
- 
         for generation in range(self.max_iterations):
+            self.population = [[pair[0], pair[0].fitness(self.train_data)] for pair in self.population]
             #Ordena la poblacion de cromosomas seleccionados segun la funcion de fitness de mayor a menor
-            self.population.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
-            next_generation = []
-
+            # self.population.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
+            self.population = (sorted(self.population, key=lambda x:x[1]))
             if self.selection_method == 'elitism':
                 #Añade en la siguiente generación los elitism_count elementos
-                next_generation = self.population[:elitism_count]
+                next_generation = [[pair[0]] for pair in self.population[:elitism_count]]
                 while len(next_generation) < self.population_size:
                     #Asigna a parent1 y parent2 los dos cromosomas ganadores del torneo
                     parent1, parent2 = self.tournament_selection(), self.tournament_selection()
                     #Se genera el cruce entra ambos padres, offspring contiene dos cromosomas hijos
-                    offspring = parent1.crossover(parent2, self.cross_rate)
+                    offspring = parent1[0].crossover(parent2[0], self.cross_rate)
                     for child in offspring:
                         if len(next_generation) < self.population_size: 
                             #Para cada hijo, se somete a la probabilidad de ser mutado
                             child.mutate(self.mutation_rate)
-                            next_generation.append(child)
+                            next_generation.append([child])
             
             
             elif self.selection_method == 'roulette':
@@ -109,11 +109,12 @@ class AG():
                 next_generation = random.choices(combined_population, weights=selection_probs, k=self.population_size)
                 
 
+            best_fitness = self.population[0][1]
             self.population = next_generation
-            best_fitness = self.population[0].fitness(self.train_data)
             print(f'Generation {generation}: Best Fitness = {best_fitness}')
 
-        winner_chromosome = min(self.population, key=lambda chromo: chromo.fitness(self.train_data))
+        winner_chromosome = min(self.population, key=lambda chromo: chromo[0].fitness(self.train_data))[0]
+        
         return winner_chromosome, self.test(winner_chromosome)
 
     def tournament_selection(self, k: int = 3) -> Chromosome:
@@ -124,10 +125,11 @@ class AG():
         :param k: Numero de cromosomas elegidos para el torneo, por defecto es 3.
         :return: Cromosoma con la mejor aptitud, de tipo Chromosome.
         '''
-
         tournament = random.sample(self.population, k)
-        tournament.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
-        return tournament[0]
+        # tournament.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
+        sorted_tournament = sorted(tournament, key=lambda x:x[1])
+
+        return sorted_tournament[0]
     
 
     def test(self, chromosome: Chromosome) -> List[float]:

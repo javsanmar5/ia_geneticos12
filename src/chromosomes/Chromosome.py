@@ -37,7 +37,7 @@ class Chromosome(AbstractChromosome):
         y_pred: List[float] = []
         y_true: List[float] = []
 
-        selected_data = random.sample(train_data, 20)
+        selected_data = random.sample(train_data, int(len(train_data) *1))
 
         for datum in selected_data:
             y_pred.append(self.predict(datum))
@@ -48,19 +48,6 @@ class Chromosome(AbstractChromosome):
 
         return rmse
     
-    def fitnessValue(self, chromosomes: List['Chromosome']) -> float:
-        y_pred: List[float] = []
-        y_true: List[float] = []
-
-        for chromosome in chromosomes:
-            y_pred.append(self.predict(chromosome))
-            y_true.append(chromosome[-1])
-
-        #y_true = [datum[-1] for datum in train_data]
-        rmse = root_mean_squared_error(y_true, y_pred)
-
-        return rmse
-
     def predict(self, datum: Tuple[float]) -> float:
         '''
         El valor predicho será la suma de c[i](x[i]**e[i]) donde:
@@ -77,8 +64,10 @@ class Chromosome(AbstractChromosome):
 
             exponent = self.exponents[i]
             
-            if datum[i] <= 0.0:
+            if datum[i] < 0.:
                 exponent = round(self.exponents[i], 0)
+            elif datum[i] == 0.:
+                exponent = abs(exponent)
                 
             prediction += self.coefficients[i] * (datum[i] ** exponent)
 
@@ -130,7 +119,7 @@ class Chromosome(AbstractChromosome):
                 
         if random_number < mutation_rate: 
             
-            max_mutate = 0.01
+            max_mutate = 0.6
 
             for i in range(len(self.exponents)):
                 self.coefficients[i] += random.uniform(-max_mutate, max_mutate)

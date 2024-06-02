@@ -37,7 +37,9 @@ class Chromosome(AbstractChromosome):
         y_pred: List[float] = []
         y_true: List[float] = []
 
-        for datum in train_data:
+        selected_data = random.sample(train_data, 20)
+
+        for datum in selected_data:
             y_pred.append(self.predict(datum))
             y_true.append(datum[-1])
 
@@ -72,9 +74,12 @@ class Chromosome(AbstractChromosome):
         prediction: float = 0.
 
         for i in range(len(datum) - 1):
+
             exponent = self.exponents[i]
+            
             if datum[i] <= 0.0:
                 exponent = round(self.exponents[i], 0)
+                
             prediction += self.coefficients[i] * (datum[i] ** exponent)
 
         prediction += self.coefficients[-1]
@@ -120,15 +125,18 @@ class Chromosome(AbstractChromosome):
         # 0 y 1, escogemos un número aleatorio, también entre 0 y 1, y la
         # probabilidad de que este número sea menor que la tasa es exactamente 
         # la tasa.
-        
+
         random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
+                
         if random_number < mutation_rate: 
+            
+            max_mutate = 0.01
 
             for i in range(len(self.exponents)):
-                self.coefficients[i] += random.uniform(-0.1, 0.1)
-                self.exponents[i] += random.uniform(-0.1, 0.1)
+                self.coefficients[i] += random.uniform(-max_mutate, max_mutate)
+                self.exponents[i] += random.uniform(-max_mutate, max_mutate)
 
-            self.coefficients[-1] += random.uniform(-0.1, 0.1)
+            self.coefficients[-1] += random.uniform(-max_mutate, max_mutate)
 
             #self.coefficients = [coeffiecient + random.uniform(-0.1, 0.1) for coeffiecient in self.coefficients]
             #self.exponents = [exponent + random.uniform(-0.1,0.1) for exponent in self.exponents]

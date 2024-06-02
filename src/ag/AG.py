@@ -12,9 +12,9 @@ class AG():
     
     def __init__(self, datos_train: str, datos_test: str, 
                     seed: int, nInd: int, maxIter: int,
-                    mutation_rate: float = 0.08,
-                    cross_rate: float = 0.8,
-                    elitism_rate: float = 0.2,
+                    mutation_rate: float = 0.06,
+                    cross_rate: float = 0.7,
+                    elitism_rate: float = 0.3,
                     selection_method: str = "elitism") -> None:
         
         random.seed(seed) # Generamos los números aleatorios con la semilla dada
@@ -101,7 +101,7 @@ class AG():
                         child.mutate(self.mutation_rate)
                         combined_population.append(child)
                 #Se calcula la suma total de la funcion fitness de cada cromosoma de combined_population
-                fitness_values = [chromosome.fitness(combined_population) for chromosome in combined_population]
+                fitness_values = [chromosome.fitness(self.train_data) for chromosome in combined_population]
                 total_fitness = sum(fitness_values)
                 #Se calcula la probabilidad de cada cromosoma
                 selection_probs = [fitness / total_fitness for fitness in fitness_values]

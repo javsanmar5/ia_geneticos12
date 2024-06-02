@@ -22,13 +22,12 @@ ag = AG(
 	# numero de individuos
 	nInd = 100, 
 	# maximo de iteraciones
-	maxIter = 3000
+	maxIter = 20
 )
 
 if __name__ == '__main__':
 	
 	# winner_chromosome, y_pred  = ag.run()
-
 
     # Ejecucion del AG midiendo el tiempo
 	inicio = time.time()
@@ -37,7 +36,8 @@ if __name__ == '__main__':
 	print(f'Tiempo ejecucion: {(fin-inicio):.2f}')
 
 	# Imprimir mejor solución encontrada
-	print(f'Mejor individuo: {ind.chromosome}')
+	print(f'Coeficientes del mejor individuo: {ind.coefficients}')
+	print(f'Coeficientes del mejor individuo: {ind.exponents}')
 	# 0.5*(a1^2) + -0.3*(a2^1) + ... + 10 # --> Se trata de un ejemplo
 
 	# Imprimir predicciones sobre el conjunto de test

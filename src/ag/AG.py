@@ -10,7 +10,7 @@ class AG():
     
     def __init__(self, datos_train: str, datos_test: str, 
                     seed: int, nInd: int, maxIter: int,
-                    mutation_rate: float = 0.01,
+                    mutation_rate: float = 0.08,
                     cross_rate: float = 0.8,
                     elitism_rate: float = 0.2,
                     selection_method: str = "elitism") -> None:
@@ -28,8 +28,10 @@ class AG():
         self.elitism_rate:          float = elitism_rate
         self.selection_method:      str = selection_method
 
-        self.population: List[Chromosome] = random.sample(
-            self.train_data, self.population_size)
+        self.population: List[Chromosome] = []
+        for i in range(self.population_size):
+            variables_amount = len(self.train_data[0]) - 1
+            self.population.append(Chromosome(variables_amount=variables_amount))
 
 
     #     self.population: List[AbstractChromosome] = self.initialize_population(
@@ -66,7 +68,7 @@ class AG():
  
         for generation in range(self.max_iterations):
             #Ordena la poblacion de cromosomas seleccionados segun la funcion de fitness de mayor a menor
-            self.population.sort(key=lambda chromo: chromo.fitness(), reverse=True)
+            self.population.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
             next_generation = []
 
             if self.selection_method == 'elitism':
@@ -97,7 +99,7 @@ class AG():
                         child.mutate(self.mutation_rate)
                         combined_population.append(child)
                 #Se calcula la suma total de la funcion fitness de cada cromosoma de combined_population
-                fitness_values = [chromosome.fitness() for chromosome in combined_population]
+                fitness_values = [chromosome.fitness(self.train_data) for chromosome in combined_population]
                 total_fitness = sum(fitness_values)
                 #Se calcula la probabilidad de cada cromosoma
                 selection_probs = [fitness / total_fitness for fitness in fitness_values]
@@ -106,10 +108,10 @@ class AG():
                 
 
             self.population = next_generation
-            best_fitness = self.population[0].fitness()
+            best_fitness = self.population[0].fitness(self.train_data)
             print(f'Generation {generation}: Best Fitness = {best_fitness}')
 
-        winner_chromosome = max(self.population, key=lambda chromo: chromo.fitness())
+        winner_chromosome = min(self.population, key=lambda chromo: chromo.fitness(self.train_data))
         return winner_chromosome, self.test(winner_chromosome)
 
     def tournament_selection(self, k: int = 3) -> Chromosome:
@@ -122,16 +124,16 @@ class AG():
         '''
 
         tournament = random.sample(self.population, k)
-        tournament.sort(key=lambda chromo: chromo.fitness(), reverse=True)
+        tournament.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
         return tournament[0]
     
 
     def test(self, chromosome: Chromosome) -> List[float]:
-        
-        results = []
+
+        y_pred: List[float] = []
+
         for datum in self.test_data:
-            y_pred = sum(chromosome.chromosome[2*i] * (datum.features[i] ** 
-                        chromosome.chromosome[2*i + 1]) for i in range(len(datum.features)))
-            results.append(y_pred)
+            predicted = chromosome.predict(datum)
+            y_pred.append(predicted)
         
-        return results
+        return y_pred

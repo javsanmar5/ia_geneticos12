@@ -1,9 +1,9 @@
 from chromosomes.Chromosome import Chromosome
-from typing import List
+from typing import List, Tuple
 
 import os
 
-def read_data(filepath: str) -> List[Chromosome]:
+def read_data(filepath: str) -> List[Tuple[float]]:
     '''
     Lee el fichero csv y lo convierte en una lista de cromosomas
     
@@ -29,12 +29,12 @@ def read_data(filepath: str) -> List[Chromosome]:
     with open(full_filepath, 'r') as file:
         
         lines = file.readlines()[1:]  # Saltar la cabecera
-        chromosomes = []
+        data = []
         
         for line in lines:
-            parts = list(map(float, line.strip().split(',')))
+            parts = tuple(map(float, line.strip().split(',')))
             features = parts[:-1]
             target = parts[-1]
-            chromosomes.append(Chromosome(features, target))
-            
-    return chromosomes
+            data.append(parts)
+
+    return data

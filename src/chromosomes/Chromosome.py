@@ -1,11 +1,13 @@
 from chromosomes.AbstractChromosome import AbstractChromosome
+from sklearn.metrics import root_mean_squared_error
 import random
-from typing import List
+from typing import List, Tuple
 
 class Chromosome(AbstractChromosome):
 
-    def __init__(self, features: List[float], target: float, 
-                 chromosome: List[float] = None) -> None:
+    def __init__(self, coefficients: List[float] = None,
+                 exponents: List[float] = None, 
+                 variables_amount: int = 0) -> None:
         '''
         La idea del cromosoma es ser una lista de tamaño 2*n
         donde n es el numero de features (características).
@@ -18,30 +20,31 @@ class Chromosome(AbstractChromosome):
         Inicialmente numeros aleatorios entre -3 y 3.
         '''
 
-        self.features:  List[float]     = features
-        self.target:    float           = target
-
-        if chromosome is None:
-            self.chromosome: List[float]= [random.uniform(-3,3) for _ in range(2 * len(features))]
+        if coefficients is None and exponents is None:
+            self.coefficients:  List[float] = [random.uniform(-3,3) for _ in range(variables_amount + 1)]
+            self.exponents:     List[float] = [random.uniform(-3,3) for _ in range(variables_amount)]
         else:
-            self.chromosome: List[float]= chromosome
-        
+            self.coefficients:  List[float] = coefficients
+            self.exponents:     List[float] = exponents
+                
 
-    def fitness(self) -> float:
+    def fitness(self, train_data: List[Tuple[float]]) -> float:
         # Valoraremos al cromosoma como la inversa de la distancia
         # entre el valor predicho y el target. 
         # Esta distancia la calcularemos con el MSE visto en la asignatura,
         # en este caso, la diferencia entre target y predicted al cuadrado.
         
-        predicted:  float = self.__predict()
-        # print(f"{self.target} -> {predicted}")
+        y_pred: List[float] = []
+
+        for datum in train_data:
+            y_pred.append(self.predict(datum))
         
-        error:      float = (self.target - predicted) ** 2 
+        y_true = [datum[-1] for datum in train_data]
+        rmse = root_mean_squared_error(y_true, y_pred)
 
-        # print(1 / error)
-        return 1 / error
+        return rmse
 
-    def __predict(self) -> float:
+    def predict(self, datum: Tuple[float]) -> float:
         '''
         El valor predicho será la suma de c[i](x[i]**e[i]) donde:
 
@@ -53,13 +56,13 @@ class Chromosome(AbstractChromosome):
         # OPCION 1
         prediction: float = 0.
 
-        for i in range(len(self.features)):
+        for i in range(len(datum) - 1):
+            exponent = self.exponents[i]
+            while type(datum[i] ** exponent) == complex:
+                exponent = 0
+            prediction += self.coefficients[i] * (datum[i] ** exponent)
 
-            while type(self.features[i] ** self.chromosome[2*i + 1]) == complex:
-                self.chromosome[2*i + 1] *= random.random() # Puede ser que no funcione por esto
-                
-            prediction += self.chromosome[2*i] * (self.features[i] ** self.chromosome[2*i + 1])
-            
+        prediction += self.coefficients[-1]
         return prediction
     
         # OPCION 2
@@ -83,13 +86,15 @@ class Chromosome(AbstractChromosome):
         if random.random() > cross_rate:
             return [self, chromosomeToCrossWith]
 
-        point = random.randint(1, len(self.chromosome) - 1) # Escogemos el punto de cruce
+        point = random.randint(1, len(self.exponents) - 1) # Escogemos el punto de cruce
 
-        child1_chromosomes = self.chromosome[:point] + chromosomeToCrossWith.chromosome[point:]
-        child2_chromosomes = chromosomeToCrossWith.chromosome[:point] + self.chromosome[point:]
+        child1_coefficients = self.coefficients[:point] + chromosomeToCrossWith.coefficients[point:] 
+        child2_coefficients = chromosomeToCrossWith.coefficients[:point] + self.coefficients[point:]
+        child1_exponents = self.exponents[:point] + chromosomeToCrossWith.exponents[point:] 
+        child2_exponents = chromosomeToCrossWith.exponents[:point] + self.exponents[point:]
         
-        return [Chromosome(self.features, self.target, child1_chromosomes),
-                Chromosome(chromosomeToCrossWith.features, chromosomeToCrossWith.target, child2_chromosomes)]
+        return [Chromosome(child1_coefficients, child1_exponents),
+                Chromosome(child2_coefficients, child2_exponents)]
 
 
     def mutate(self, mutation_rate: float) -> None:
@@ -103,4 +108,5 @@ class Chromosome(AbstractChromosome):
         
         random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
         if random_number < mutation_rate: 
-            self.chromosome = [value + random.uniform(-0.1, 0.1) for value in self.chromosome]
+            self.coefficients = [coeffiecient + random.uniform(-0.1, 0.1) for coeffiecient in self.coefficients]
+            self.exponents = [exponent + random.uniform(-0.1,0.1) for exponent in self.exponents]

@@ -2,11 +2,17 @@
 
 from chromosomes.Chromosome import Chromosome
 from ag.csv_reader import *
-import time
+from multiprocessing import Process
+
 
 
 from typing import List, Tuple # Ayudas para documentacion
 import random
+
+# Definir una función para calcular el fitness de cada individuo
+def calcular_fitness(individuo, train_data, data_percentage):
+    fitness_value = individuo.fitness(train_data, data_percentage)
+    return [individuo, fitness_value]
 
 class AG():
 
@@ -53,8 +59,25 @@ class AG():
 
         #Cantidad de individuos que pasan directamente a la siguiente poblacion
         elitism_count = int(self.elitism_rate * self.population_size)
+        #pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+
         for generation in range(self.max_iterations):
-            self.population = [[pair[0], pair[0].fitness(self.train_data, self.data_percentage)] for pair in self.population]
+
+            # Crear una lista para almacenar los procesos
+            procesos = []
+
+            # Iterar sobre cada individuo en la población y crear un proceso para calcular su fitness
+            for individuo in self.population:
+                proceso = Process(target=calcular_fitness, args=(individuo[0], self.train_data, self.data_percentage))
+                procesos.append(proceso)
+                proceso.start()
+
+            # Esperar a que todos los procesos terminen
+            for proceso in procesos:
+                proceso.join()
+
+            # Obtener los resultados de los procesos
+            self.population = [proceso.get() for proceso in procesos]
             #Ordena la poblacion de cromosomas seleccionados segun la funcion de fitness de mayor a menor
             # self.population.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
             self.population = (sorted(self.population, key=lambda x:x[1]))

@@ -34,20 +34,25 @@ class Chromosome(AbstractChromosome):
         # entre el valor predicho y el target. 
         # Esta distancia la calcularemos con el MSE visto en la asignatura,
         # en este caso, la diferencia entre target y predicted al cuadrado.
-        
-        y_pred: List[float] = []
-        y_true: List[float] = []
 
         selected_data = random.sample(train_data, int(len(train_data) * data_percentage))
 
+        lista = self.fitnessAux(selected_data)
+        #y_true = [datum[-1] for datum in train_data]
+        rmse = root_mean_squared_error(lista[1], lista[0])
+
+        return rmse
+    
+    def fitnessAux(self, selected_data: List[Tuple[float]]):
+        y_pred: List[float] = []
+        y_true: List[float] = []
+        lista: List[List[float]] = []
         for datum in selected_data:
             y_pred.append(self.predict(datum))
             y_true.append(datum[-1])
-
-        #y_true = [datum[-1] for datum in train_data]
-        rmse = root_mean_squared_error(y_true, y_pred)
-
-        return rmse
+            lista.append(y_pred)
+            lista.append(y_true)
+        return lista
     
     def predict(self, datum: Tuple[float]) -> float:
         '''

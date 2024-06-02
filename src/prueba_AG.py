@@ -18,7 +18,7 @@ nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv
 nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
 parameters = {
-	"housing": (20, 300),
+	"housing": (20, 20),
 	"synt1": (20,100),
 	"toy1": (200, 500)
 }

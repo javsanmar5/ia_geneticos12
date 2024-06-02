@@ -35,11 +35,26 @@ class Chromosome(AbstractChromosome):
         # en este caso, la diferencia entre target y predicted al cuadrado.
         
         y_pred: List[float] = []
+        y_true: List[float] = []
 
         for datum in train_data:
             y_pred.append(self.predict(datum))
-        
-        y_true = [datum[-1] for datum in train_data]
+            y_true.append(datum[-1])
+
+        #y_true = [datum[-1] for datum in train_data]
+        rmse = root_mean_squared_error(y_true, y_pred)
+
+        return rmse
+    
+    def fitnessValue(self, chromosomes: List['Chromosome']) -> float:
+        y_pred: List[float] = []
+        y_true: List[float] = []
+
+        for chromosome in chromosomes:
+            y_pred.append(self.predict(chromosome))
+            y_true.append(chromosome[-1])
+
+        #y_true = [datum[-1] for datum in train_data]
         rmse = root_mean_squared_error(y_true, y_pred)
 
         return rmse
@@ -58,8 +73,8 @@ class Chromosome(AbstractChromosome):
 
         for i in range(len(datum) - 1):
             exponent = self.exponents[i]
-            if datum[i] < 0.0:
-                exponent = 0
+            if datum[i] <= 0.0:
+                exponent = round(self.exponents[i], 0)
             prediction += self.coefficients[i] * (datum[i] ** exponent)
 
         prediction += self.coefficients[-1]
@@ -108,5 +123,12 @@ class Chromosome(AbstractChromosome):
         
         random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
         if random_number < mutation_rate: 
-            self.coefficients = [coeffiecient + random.uniform(-0.1, 0.1) for coeffiecient in self.coefficients]
-            self.exponents = [exponent + random.uniform(-0.1,0.1) for exponent in self.exponents]
+
+            for i in range(len(self.exponents)):
+                self.coefficients[i] += random.uniform(-0.1, 0.1)
+                self.exponents[i] += random.uniform(-0.1, 0.1)
+
+            self.coefficients[-1] += random.uniform(-0.1, 0.1)
+
+            #self.coefficients = [coeffiecient + random.uniform(-0.1, 0.1) for coeffiecient in self.coefficients]
+            #self.exponents = [exponent + random.uniform(-0.1,0.1) for exponent in self.exponents]

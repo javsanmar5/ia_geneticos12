@@ -2,6 +2,8 @@
 
 from chromosomes.Chromosome import Chromosome
 from ag.csv_reader import *
+import time
+
 
 from typing import List, Tuple # Ayudas para documentacion
 import random
@@ -99,7 +101,7 @@ class AG():
                         child.mutate(self.mutation_rate)
                         combined_population.append(child)
                 #Se calcula la suma total de la funcion fitness de cada cromosoma de combined_population
-                fitness_values = [chromosome.fitness(self.train_data) for chromosome in combined_population]
+                fitness_values = [chromosome.fitness(combined_population) for chromosome in combined_population]
                 total_fitness = sum(fitness_values)
                 #Se calcula la probabilidad de cada cromosoma
                 selection_probs = [fitness / total_fitness for fitness in fitness_values]

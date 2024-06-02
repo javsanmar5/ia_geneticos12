@@ -10,6 +10,15 @@ nombre_dataset = 'toy1'
 nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv"
 nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
+parameters = {
+	"housing": (20, 300),
+	"synt1": (20,50),
+	"toy1": (200, 500)
+}
+
+if nombre_dataset not in parameters.keys():
+	raise ValueError(f"No contamos con los datos {nombre_dataset} de momento.")
+
 # La clase AG debe estar implementada	
 # (importe los ficheros necesarios antes de ejecutar las siguientes lineas)
 ag = AG(
@@ -20,9 +29,9 @@ ag = AG(
 	# semilla para numeros aleatorios
 	seed=123, 
 	# numero de individuos
-	nInd = 200, 
+	nInd = parameters.get(nombre_dataset, 50)[0], 
 	# maximo de iteraciones
-	maxIter = 500
+	maxIter = parameters.get(nombre_dataset, 500)[1]
 )
 
 if __name__ == '__main__':

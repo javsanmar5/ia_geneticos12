@@ -22,7 +22,7 @@ ag = AG(
 	# numero de individuos
 	nInd = 100, 
 	# maximo de iteraciones
-	maxIter = 20
+	maxIter = 10
 )
 
 if __name__ == '__main__':

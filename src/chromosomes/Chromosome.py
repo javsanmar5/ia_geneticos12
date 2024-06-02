@@ -58,7 +58,7 @@ class Chromosome(AbstractChromosome):
 
         for i in range(len(datum) - 1):
             exponent = self.exponents[i]
-            while type(datum[i] ** exponent) == complex:
+            if datum[i] < 0.0:
                 exponent = 0
             prediction += self.coefficients[i] * (datum[i] ** exponent)
 

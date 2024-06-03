@@ -4,48 +4,50 @@ import sys
 
 from sklearn.metrics import root_mean_squared_error, r2_score
 from ag.AG import AG
+from log import records
 
 
-# Nombre generico del dataset
-if len(sys.argv) == 1:
-	nombre_dataset = 'housing'
-else: 
-	nombre_dataset = sys.argv[1]
 
-print(f"Fichero: {nombre_dataset.capitalize()}")
+def main(*args, **kwargs):
 
-nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv"
-nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
+	# Nombre generico del dataset
+	if len(kwargs["argv"]) == 1:
+		nombre_dataset = 'housing'
+	else: 
+		nombre_dataset = kwargs["argv"][1]
 
-parameters = {
-	"housing": (20, 20),
-	"synt1": (20,100),
-	"toy1": (200, 500)
-}
+	print(f"Fichero: {nombre_dataset.capitalize()}")
 
-if nombre_dataset not in parameters.keys():
-	raise ValueError(f"No contamos con los datos {nombre_dataset} de momento.")
+	nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv"
+	nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
-# La clase AG debe estar implementada	
-# (importe los ficheros necesarios antes de ejecutar las siguientes lineas)
-ag = AG(
-	# datos de entrenamiento (para el proceso del AG)
-	datos_train = nombre_dataset_train, 
-	# datos de validacion/test (para predec	ir)
-	datos_test = nombre_dataset_val, 
-	# semilla para numeros aleatorios
-	seed=123, 
-	# numero de individuos
-	nInd = parameters.get(nombre_dataset, 50)[0], 
-	# maximo de iteraciones
-	maxIter = parameters.get(nombre_dataset, 500)[1]
-)
+	parameters = {
+		"housing": (20, 300),
+		"synt1": (2000,1000),
+		"toy1": (200, 500)
+	}
 
-if __name__ == '__main__':
-	
+	if nombre_dataset not in parameters.keys():
+		raise ValueError(f"No contamos con los datos {nombre_dataset} de momento.")
+
+	# La clase AG debe estar implementada	
+	# (importe los ficheros necesarios antes de ejecutar las siguientes lineas)
+	ag = AG(
+		# datos de entrenamiento (para el proceso del AG)
+		datos_train = nombre_dataset_train, 
+		# datos de validacion/test (para predec	ir)
+		datos_test = nombre_dataset_val, 
+		# semilla para numeros aleatorios
+		seed=9999, 
+		# numero de individuos
+		nInd = parameters.get(nombre_dataset, 50)[0], 
+		# maximo de iteraciones
+		maxIter = parameters.get(nombre_dataset, 500)[1]
+	)
+
 	# winner_chromosome, y_pred  = ag.run()
 
-    # Ejecucion del AG midiendo el tiempo
+	# Ejecucion del AG midiendo el tiempo
 	inicio = time.time()
 	ind, y_pred = ag.run()
 	fin = time.time()
@@ -69,3 +71,10 @@ if __name__ == '__main__':
 
 	r2 = r2_score(y_true, y_pred)
 	print(f'R2: {r2:.4f}')
+
+	records(nombre_dataset.upper(), rmse, r2, fin-inicio)
+
+
+if __name__ == '__main__':
+	main(argv = sys.argv)
+	

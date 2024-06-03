@@ -6,9 +6,9 @@ file: TOY1
 	time:	0.
 
 file: HOUSING
-	rmse:	0.
-	r2:		0.
-	time:	0.
+	rmse:	0.8023
+	r2:		0.5207
+	time:	30.78
 
 file: SYNT1
 	rmse:	0. 

@@ -23,7 +23,7 @@ def read_data(filepath: str) -> List[Tuple[float]]:
         data = []
         
         for line in lines:
-            parts = tuple(map(float, line.strip().split(',')))
+            parts = list(map(float, line.strip().split(',')))
             features = parts[:-1]
             target = parts[-1]
             data.append(parts)

@@ -1,7 +1,9 @@
 from chromosomes.AbstractChromosome import AbstractChromosome
 from sklearn.metrics import root_mean_squared_error
+from multiprocessing import Pool, Queue
 import random
 from typing import List, Tuple
+from multiprocessing import Process
 
 class Chromosome(AbstractChromosome):
 
@@ -29,32 +31,37 @@ class Chromosome(AbstractChromosome):
             self.exponents:     List[float] = exponents
                 
 
-    def fitness(self, train_data: List[Tuple[float]], data_percentage: float = 1.) -> float:
-        # Valoraremos al cromosoma como la inversa de la distancia
-        # entre el valor predicho y el target. 
-        # Esta distancia la calcularemos con el MSE visto en la asignatura,
-        # en este caso, la diferencia entre target y predicted al cuadrado.
-
+    def fitness(self, train_data: List[List[float]], data_percentage: float = 1.) -> float:
+        # Seleccionamos los datos a usar en el cálculo
         selected_data = random.sample(train_data, int(len(train_data) * data_percentage))
+        
+        # Limitamos los procesos a 4
+        num_processes = 4
+        chunksize = len(selected_data) // (num_processes * 4)
 
-        lista = self.fitnessAux(selected_data)
-        #y_true = [datum[-1] for datum in train_data]
-        rmse = root_mean_squared_error(lista[1], lista[0])
+        # Usamos un pool de procesos para limitar el número de procesos simultáneos
+        with Pool(processes=num_processes) as pool:
+            for data in selected_data:
+                print(data)
+                results = pool.map(self.fitnessAux, [data] * len(data), chunksize=chunksize)
 
+        # Convertimos la lista de listas en dos listas separadas para y_pred y y_true
+        y_pred = [result[0] for result in results]
+        y_true = [result[1] for result in results]
+
+        # Cálculo del RMSE
+        rmse = root_mean_squared_error(y_true, y_pred)  # root_mean_squared_error is not directly available in sklearn, using mean_squared_error with squared=False
+        print("RMSE:",rmse)
         return rmse
-    
-    def fitnessAux(self, selected_data: List[Tuple[float]]):
-        y_pred: List[float] = []
-        y_true: List[float] = []
-        lista: List[List[float]] = []
-        for datum in selected_data:
-            y_pred.append(self.predict(datum))
-            y_true.append(datum[-1])
-            lista.append(y_pred)
-            lista.append(y_true)
-        return lista
-    
-    def predict(self, datum: Tuple[float]) -> float:
+
+    def fitnessAux(self, datum: List[float]):
+        print("DATOS: ", datum)
+        y_pred = self.predict(datum)
+        y_true = datum[-1]
+        print("Aqui estamo")
+        return [y_pred, y_true]
+        
+    def predict(self, datum: List[float]) -> float:
         '''
         El valor predicho será la suma de c[i](x[i]**e[i]) donde:
 

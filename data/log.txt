@@ -1,0 +1,16 @@
+RECORDS, BEST VALUES OBTAINED
+
+file: TOY1
+	rmse:	0.
+	r2:		0.
+	time:	0.
+
+file: HOUSING
+	rmse:	0.
+	r2:		0.
+	time:	0.
+
+file: SYNT1
+	rmse:	0. 
+	r2:		0.
+	time:	0.

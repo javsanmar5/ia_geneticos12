@@ -13,7 +13,7 @@ def records(file: str, rmse: float, r2: float, time: float) -> None:
     '''
 
     current_dir = os.path.dirname(__file__)
-    data_dir = os.path.abspath(os.path.join(current_dir, '..', 'data', 'log.txt'))
+    data_dir = os.path.abspath(os.path.join(current_dir, '..', '..', 'data', 'log.txt'))
 
     # Leemos el archivo
     with open(data_dir, 'r') as f:

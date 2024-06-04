@@ -12,7 +12,7 @@ def main(*args, **kwargs):
 
 	# Nombre generico del dataset
 	if len(kwargs["argv"]) == 1:
-		nombre_dataset = 'housing'
+		nombre_dataset = 'housing'	
 	else: 
 		nombre_dataset = kwargs["argv"][1]
 

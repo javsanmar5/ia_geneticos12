@@ -4,7 +4,7 @@ import sys
 
 from sklearn.metrics import root_mean_squared_error, r2_score
 from ag.AG import AG
-from log import records
+from utils.log import records
 
 
 
@@ -23,7 +23,7 @@ def main(*args, **kwargs):
 
 	parameters = {
 		"housing": (20, 300),
-		"synt1": (2000,1000),
+		"synt1": (20, 500),
 		"toy1": (200, 500)
 	}
 
@@ -38,7 +38,7 @@ def main(*args, **kwargs):
 		# datos de validacion/test (para predec	ir)
 		datos_test = nombre_dataset_val, 
 		# semilla para numeros aleatorios
-		seed=9999, 
+		seed=123, 
 		# numero de individuos
 		nInd = parameters.get(nombre_dataset, 50)[0], 
 		# maximo de iteraciones

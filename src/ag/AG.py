@@ -1,8 +1,7 @@
 # Trabajo realizado por: Javier Ruíz, Javier Santos 
 
 from chromosomes.Chromosome import Chromosome
-from ag.csv_reader import *
-import time
+from utils.csv_reader import *
 
 
 from typing import List, Tuple # Ayudas para documentacion
@@ -18,7 +17,7 @@ class AG():
         # tasa de elitismo, rango inicial del cromosoma, porcentaje de datos, método.
         parameters = {
             "housing_data/housing_train.csv": (0.25, 0.6, 0.7, 0.2, 0.7, 0.1, "elitism"),
-            "synt1_data/synt1_train.csv": (0.2, 20, 0.7, 0.1, 0.1, 0.1, "elitism"),
+            "synt1_data/synt1_train.csv": (0.2, 0.4, 0.8, 0.1, 1., 0.5, "elitism"),
             "toy1_data/toy1_train.csv": (0.25, 0.6, 0.7, 0.2, 3., 1., "elitism")
         }
 

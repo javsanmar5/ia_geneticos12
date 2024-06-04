@@ -47,20 +47,20 @@ Podemos utilizar un entorno virtual o el entorno de *Python* instalado en su equ
     ```
 
 4. **Ejecutar el Proyecto**:
-    - Lanza el fichero de prueba *src/test/prueba_AG.py*.
+    Lanza el fichero de prueba *src/test/prueba_AG.py*.
     Opciones:
 
-        - Lanzarlo por defecto: Por defecto se ejecutará el fichero de prueba *housing*. Si se quiere modificar se podrá modificar manualmente en el fichero.
-            ```sh
-            python src/prueba_AG.py
-            ```
+    - Ejecución por defecto: De manera predeterminada, se utilizará el archivo ubicado en src/prueba_AG.py. Este archivo se puede modificar manualmente. Para ejecutarlo de esta forma, se debe utilizar el siguiente comando:   
+        ```sh
+        python src/prueba_AG.py
+        ```
 
-        - Pasar el nombre del fichero como parametro. Por defecto: *housing*. 
-            ```sh
-            python src/prueba_AG.py nombre_fichero
-            ```
+    - Pasar el nombre del fichero como parámetro: Para ejecutarlo de esta forma, se debe utilizar el siguiente comando:
+        ```sh
+        python src/prueba_AG.py nombre_fichero
+        ```
 
-    En ambos casos las opciones de fichero son: *housing, synt1 y toy1*
+    En ambos casos las opciones de fichero son: **housing**, **synt1** y **toy1**. Y el comando *python* puede ser modificado por *python3* si es necesario.
 
 
 

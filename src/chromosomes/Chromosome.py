@@ -74,12 +74,12 @@ class Chromosome(AbstractChromosome):
 
         for i in range(len(datum) - 1):
 
-            exponent = self.exponents[i]
-            
             if datum[i] < 0.:
-                exponent = round(self.exponents[i], 0)
+                self.exponents[i] = round(self.exponents[i], 0)
             elif datum[i] == 0.:
-                exponent = abs(exponent)
+                self.exponents[i] = abs(self.exponents[i])
+
+            exponent = self.exponents[i]
                 
             prediction += self.coefficients[i] * (datum[i] ** exponent)
 

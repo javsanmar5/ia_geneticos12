@@ -1,0 +1,5 @@
+OPTIMIZACIONES PARA EXPLICAR:
+	- No utilizar todos los datos de prueba en cada valoración
+	- Guardar en la población parejas de cromosomas con su fitness
+
+

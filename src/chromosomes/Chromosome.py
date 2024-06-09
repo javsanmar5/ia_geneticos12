@@ -110,12 +110,15 @@ class Chromosome(AbstractChromosome):
         # probabilidad de que este número sea menor que la tasa es exactamente 
         # la tasa.
 
-        random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
-                
-        if random_number < mutation_rate: 
             
-            for i in range(len(self.exponents)):
+        for i in range(len(self.exponents)):
+
+            random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
+            if random_number < mutation_rate: 
+
                 self.coefficients[i] += random.uniform(-mutation_range, mutation_range)
                 self.exponents[i] += random.uniform(-mutation_range, mutation_range)
 
+        random_number = random.random()
+        if random_number < mutation_rate: 
             self.coefficients[-1] += random.uniform(-mutation_range, mutation_range)

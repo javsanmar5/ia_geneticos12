@@ -27,7 +27,7 @@ def main(*args, **kwargs):
 		"toy1": (200, 500)
 	}
 
-	seed = 22
+	seed = 123
 
 	if nombre_dataset not in parameters.keys():
 		raise ValueError(f"No contamos con los datos {nombre_dataset} de momento.")

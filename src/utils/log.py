@@ -1,6 +1,6 @@
 import os
 
-def records(file: str, rmse: float, r2: float, time: float) -> None:
+def records(file: str, rmse: float, r2: float, time: float, seed: int) -> None:
     '''
     Guardamos los datos obtenidos en caso de que sean 
     mejores que los records existentes.
@@ -33,17 +33,20 @@ def records(file: str, rmse: float, r2: float, time: float) -> None:
                 lines[i + 1] = f"\trmse:\t{rmse:.4f}\n"
                 lines[i + 2] = f"\tr2:\t\t{r2:.4f}\n"
                 lines[i + 3] = f"\ttime:\t{time:.2f}\n"
+                lines[i + 4] = f"\tseed:\t{seed}\n"
             file_found = True
             break
 
     # Si no se encontró, es decir, estamos ante un nuevo
     # fichero, agregamos una nueva entrada
     if not file_found:
+        print(f"Nuevo fichero {file}. Datos añadidos a data/log.txt")
         new_entry = [
             f"\nfile: {file}\n",
             f"\trmse:\t{rmse:.4f}\n",
             f"\tr2:\t\t{r2:.4f}\n",
             f"\ttime:\t{time:.2f}\n"
+            f"\tseed:\t{seed}\n"
         ]
         lines.extend(new_entry)
 

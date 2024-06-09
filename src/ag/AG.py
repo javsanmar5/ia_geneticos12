@@ -17,7 +17,7 @@ class AG():
         # tasa de elitismo, rango inicial del cromosoma, porcentaje de datos, método.
         parameters = {
             "housing_data/housing_train.csv": (0.25, 0.6, 0.7, 0.2, 0.7, 0.1),
-            "synt1_data/synt1_train.csv": (0.2, 0.4, 0.8, 0.1, 1., 0.5),
+            "synt1_data/synt1_train.csv": (0.2, 0.4, 0.8, 0.1, 1., 0.2),
             "toy1_data/toy1_train.csv": (0.25, 0.6, 0.7, 0.2, 3., 1.)
         }
 

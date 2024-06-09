@@ -97,22 +97,36 @@ como el que sigue.
 
 \section{Preliminares}
 
-En esta sección se hace una breve introducción de las técnicas empleadas y
-también trabajos relacionados, si los hay.
+La idea principal de este trabajo es la aplicación de algoritmos genéticos para abordar problemas de regresión no lineal. La representación de los cromosomas se realiza con el propósito de modelar posibles soluciones a este problema. Dado que se trata de un problema de regresión, la estructura del cromosoma incluye tanto los coeficientes como los exponentes. Para ello, el cromosoma se organiza en dos listas: una de coeficientes y otra de exponentes correspondientes a las variables del problema. La evaluación de estos cromosomas se lleva a cabo utilizando el error cuadrático medio (RMSE) entre los valores reales esperados y los valores predichos generados por cada cromosoma.
 
+A continuación, se detallan las diferentes partes de este algoritmo:
 
-\subsection{Métodos empleados}
+\subsection{Cromosoma}
 
-Describir aquí los métodos y técnicas empleadas (búsqueda en espacio de
-estados, algoritmos genéticos, redes bayesianas, técnicas de clasificación,
-redes neuronales, etc.). Si es necesario, separarlos en distintas subsecciones
-dentro de Antecedentes.
-
-Se pueden usar listas por puntos como sigue:
+\textbf{Propiedades:}
 \begin{itemize}
-\item Un punto: esto es un ejemplo de una lista.
-\item Otro punto.
+    \item \textbf{Lista de coeficientes:} Esta lista contiene \( n + 1 \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( i \) de la lista representa el coeficiente de la variable \( x_i \), mientras que el último elemento representa el término independiente.
+    \item \textbf{Lista de exponentes:} Esta lista contiene \( n \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( i \) de la lista representa el exponente de la variable \( x_i \).    
 \end{itemize}
+
+Aunque, a priori, todos los elementos de ambas listas no tienen restricciones en cuanto a los valores que pueden adoptar, existen dos situaciones que podrían limitar estos valores:
+
+1. \textbf{La variable \( x_i \) es negativa en alguno de los puntos aportados como datos de entrenamiento}: En este caso, el exponente de la función no podría adoptar valores fraccionarios con denominador par, de la forma \( k/m \) tal que \( m \) sea par, en el contexto de los números reales. Sin embargo, esto presenta un problema en Python, ya que cualquier número negativo elevado a una potencia fraccionaria, sea esta par o impar, genera un número complejo, lo cual no es deseable porque estamos trabajando en R.
+
+2. \textbf{La variable \( x_i \) es cero en alguno de los puntos aportados como datos de entrenamiento}: Aquí, el problema surge con los exponentes negativos, pues esta operación está indeterminada. Por tanto, para resolver este problema, utilizamos el valor absoluto del exponente, ya que al saber que la función a interpolar está definida en \( x_i = 0 \), podemos afirmar que \( e_i > 0 \).
+
+Utilizando los valores de este cromosoma, obtendríamos una \(\hat{y}\) de la siguiente forma:
+\[
+\hat{y} = \sum_{i=0}^{n} c_i x_i^{e_i} + c_{n+1}
+\]
+
+
+
+
+\subsubsection{Fitness}
+
+
+
 
 Por último, se debe hacer un uso correcto de las referencias bibliográficas,
 para que el lector pueda acceder a más información~\cite{b2}. Todas las

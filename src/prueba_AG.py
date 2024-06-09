@@ -22,10 +22,12 @@ def main(*args, **kwargs):
 	nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
 	parameters = {
-		"housing": (20, 300),
-		"synt1": (20, 500),
+		"housing": (36, 300),
+		"synt1": (20, 100),
 		"toy1": (200, 500)
 	}
+
+	seed = 22
 
 	if nombre_dataset not in parameters.keys():
 		raise ValueError(f"No contamos con los datos {nombre_dataset} de momento.")
@@ -38,7 +40,7 @@ def main(*args, **kwargs):
 		# datos de validacion/test (para predec	ir)
 		datos_test = nombre_dataset_val, 
 		# semilla para numeros aleatorios
-		seed=123, 
+		seed=seed, 
 		# numero de individuos
 		nInd = parameters.get(nombre_dataset, 50)[0], 
 		# maximo de iteraciones
@@ -72,7 +74,7 @@ def main(*args, **kwargs):
 	r2 = r2_score(y_true, y_pred)
 	print(f'R2: {r2:.4f}')
 
-	records(nombre_dataset.upper(), rmse, r2, fin-inicio)
+	records(nombre_dataset.upper(), rmse, r2, fin-inicio, seed)
 
 
 if __name__ == '__main__':

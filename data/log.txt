@@ -4,13 +4,16 @@ file: TOY1
 	rmse:	0.0984
 	r2:		0.9953
 	time:	38.85
+	seed: 	0
 
 file: HOUSING
-	rmse:	0.7935
-	r2:		0.5311
-	time:	17.89
+	rmse:	0.7447
+	r2:		0.5870
+	time:	48.98
+	seed:	22
 
 file: SYNT1
-	rmse:	0. 
-	r2:		0.
-	time:	0.
+	rmse:	216.7349
+	r2:		-0.3510
+	time:	16.83
+	seed:	22

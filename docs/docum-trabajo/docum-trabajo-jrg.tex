@@ -77,112 +77,140 @@
 
 \section{Introducción}
 
-En esta sección se dedican varios párrafos para dar el contexto en el que se
-desarrolla el trabajo presentado. Normalmente se va desde lo más general a lo
-más preciso, para englobar el trabajo dentro de un ámbito concreto. Hay que
-recordar que se debe referenciar la información que se consiga de fuentes
-bibliográficas (artículos, libros, capítulos de libros, páginas web, apuntes,
-etc.). Para ello se añade el ítem correspondiente en el apartado de
-referencias, dotándolo de un número, y se añade la referencia al final de la
-frase o párrafo correspondiente~\cite{b1}. Si se realiza en Microsoft Word o
-LibreOffice, se puede hacer uso de \emph{referencias cruzadas} para actualizar
-la numeración de las referencias de forma automática en todo el documento.
+En el campo de la inteligencia artificial y el aprendizaje automático, los algoritmos genéticos se han destacado como una poderosa herramienta para resolver problemas de optimización y búsqueda en espacios complejos. Estos algoritmos, inspirados en los procesos de selección natural y evolución biológica, se aplican a una variedad de dominios, desde la ingeniería hasta la economía, proporcionando soluciones efectivas donde otros métodos tradicionales pueden fallar. Los problemas de regresión no lineal, en particular, presentan desafíos significativos debido a la naturaleza intrínseca de sus relaciones no lineales entre variables. La búsqueda de modelos precisos y eficientes para estas relaciones es crucial en muchas aplicaciones prácticas, como la predicción financiera, la modelización de sistemas físicos y la medicina.
 
-Después vienen un par de párrafos para dar un poco más de detalle sobre el
-trabajo realizado. Hay que indicar la problemática o el objetivo que se marca,
-y cómo se ha enfocado la solución propuesta en este trabajo. Finalmente, el
-último párrafo se dedica a comentar la estructura del documento por secciones,
-como el que sigue.
+La problemática central de este proyecto radica en la precisión insuficiente de los métodos tradicionales de regresión lineal para modelar relaciones no lineales complejas en conjuntos de datos. El objetivo es desarrollar un modelo de regresión no lineal más preciso mediante el uso de algoritmos genéticos. La solución implementada se basa en la creación de cromosomas que representan coeficientes y exponentes para cada característica del conjunto de datos. Estos cromosomas son evaluados utilizando el error cuadrático medio (RMSE) como métrica de aptitud. El algoritmo genético itera sobre una población de cromosomas, aplicando operadores de selección por torneo, cruce y mutación, para optimizar los parámetros del modelo. El enfoque permite explorar de manera eficiente el espacio de búsqueda y ajustar los coeficientes y exponentes para minimizar el RMSE, mejorando así la capacidad del modelo de predecir futuros ejemplos.
 
+El documento está estructurado de la siguiente manera: Tras la introducción, en la Sección II se describen los fundamentos teóricos con los que se ha trabajado el algoritmo genético y la regresión no lineal. La Sección III detalla la metodología propuesta, incluyendo la representación de los cromosomas, los operadores genéticos utilizados y el proceso de evaluación de los modelos. En la Sección IV se presentan los experimentos realizados y los resultados obtenidos, destacando las ventajas y limitaciones del enfoque propuesto. Finalmente, en la Sección V se presentan las conclusiones y se sugieren posibles líneas de investigación futura.
 
 \section{Preliminares}
 
+En este trabajo, se busca aplicar la idea de los algoritmos genéticos para resolver problemas de regresión. Para ello, los cromosomas modelarán los parámetros de la función que intentamos predecir, y su valoración se realizará utilizando datos de prueba. Esto se llevará a cabo prediciendo los datos y evaluando la precisión de las predicciones comparándolas con los resultados esperados.
 
-La idea principal de este trabajo es la aplicación de algoritmos genéticos para abordar problemas de regresión no lineal. La representación de los cromosomas se realiza con el propósito de modelar posibles soluciones a este problema. Dado que se trata de un problema de regresión, la estructura del cromosoma incluye tanto los coeficientes como los exponentes. Para ello, el cromosoma se organiza en dos listas: una de coeficientes y otra de exponentes correspondientes a las variables del problema. La evaluación de estos cromosomas se lleva a cabo utilizando el error cuadrático medio (RMSE) entre los valores reales esperados y los valores predichos generados por cada cromosoma.
-
-A continuación, se detallan las diferentes partes de este algoritmo:
+Todo esto se desarrollará dentro de un algoritmo genético estándar, que incluirá componentes como el elitismo, el cruce entre cromosomas y la mutación aleatoria. Finalmente, se explicarán algunas medidas para mejorar la eficiencia en este contexto específico.
 
 \subsection{Cromosoma}
 
-\textbf{Propiedades:}
+\subsubsection{Propiedades}
 \begin{itemize}
-    \item \textbf{Lista de coeficientes:} Esta lista contiene \( n + 1 \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( i \) de la lista representa el coeficiente de la variable \( x_i \), mientras que el último elemento representa el término independiente.
-    \item \textbf{Lista de exponentes:} Esta lista contiene \( n \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( i \) de la lista representa el exponente de la variable \( x_i \).    
+    \item \textbf{Lista de coeficientes:} Esta lista contiene \( n + 1 \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( j \) de la lista representa el coeficiente de la variable \( x_j \), mientras que el último elemento representa el término independiente.
+    \item \textbf{Lista de exponentes:} Esta lista contiene \( n \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( j \) de la lista representa el exponente de la variable \( x_j \).
 \end{itemize}
 
 Aunque, a priori, todos los elementos de ambas listas no tienen restricciones en cuanto a los valores que pueden adoptar, existen dos situaciones que podrían limitar estos valores:
 
-1. \textbf{La variable \( x_i \) es negativa en alguno de los puntos aportados como datos de entrenamiento}: En este caso, el exponente de la función no podría adoptar valores fraccionarios con denominador par, de la forma \( k/m \) tal que \( m \) sea par, en el contexto de los números reales. Sin embargo, esto presenta un problema en Python, ya que cualquier número negativo elevado a una potencia fraccionaria, sea esta par o impar, genera un número complejo, lo cual no es deseable porque estamos trabajando en R.
 
-2. \textbf{La variable \( x_i \) es cero en alguno de los puntos aportados como datos de entrenamiento}: Aquí, el problema surge con los exponentes negativos, pues esta operación está indeterminada. Por tanto, para resolver este problema, utilizamos el valor absoluto del exponente, ya que al saber que la función a interpolar está definida en \( x_i = 0 \), podemos afirmar que \( e_i > 0 \).
+1. \textbf{Variable \( x_i \) negativa:} En este caso, el exponente de la función no puede asumir valores fraccionarios cuyo denominador sea par, es decir, de la forma \( k/m \) donde \( m \) es par, en el ámbito de los números reales. Este hecho plantea un problema en Python, ya que cualquier número negativo elevado a una potencia fraccionaria, ya sea con un denominador par o impar, resulta en un número complejo. Esto no es deseable, dado que estamos trabajando en el conjunto de los números reales \( \mathbb{R} \). Podemos ver este fallo de Python ejemplificado a continuación, donde se eleva un número negativo \( -1 \) a un número fraccionario con denominador impar \( 0.2 = \frac{1}{5} \), lo que resulta en la raíz quinta de \(-1\), que es igual a \(-1\):
 
-Utilizando los valores de este cromosoma, obtendríamos una \(\hat{y}\) de la siguiente forma:
+Esperado:
 \[
-\hat{y} = \sum_{i=0}^{n} c_i x_i^{e_i} + c_{n+1}
+\sqrt[5]{-1} = -1
 \]
 
+Obtenido:
+\begin{verbatim}
+>>> base, exponent = -1, 0.2
+>>> base ** exponent
+(0.8090169943749475+0.5877852522924731j)
+\end{verbatim}
 
+Para resolver este problema, hemos decidido redondear los exponentes a su parte entera en los casos donde surge esta dificultad. Esta decisión se tomó después de descartar otras opciones, como intentar modificar la fracción para garantizar que el denominador sea impar (lo cual hemos observado que no es efectivo por el error de Python) o alterar la base (representada por la variable \(x_j\)), lo cual consideramos completamente incorrecto. Modificar la base implicaría permitir exponentes que generan este problema y exigiría a quienes utilicen esta solución que ajusten sus variables para trabajar con números positivos. Además, sabemos que si alteramos la base, es decir, los datos de entrada, el valor esperado \(y_i\) ya no sería válido, dado que el dato de entrada no sería el original.
+
+
+
+
+2. \textbf{Variable \( x_i \) igual a cero:} Aquí, el problema surge con los exponentes negativos, pues esta operación está indeterminada. Por tanto, para resolver este problema, utilizamos el valor absoluto del exponente, ya que al saber que la función a interpolar está definida en \( x_i = 0 \), podemos afirmar que \( e_j > 0 \).
 
 
 \subsubsection{Fitness}
+En esta sección, se realizará la evaluación de los cromosomas. Una idea fundamental en los algoritmos genéticos es la capacidad de valorar con la mayor precisión posible cada cromosoma, con el objetivo de determinar si un cromosoma es mejor o peor que otro. En el contexto de un problema de regresión, esta evaluación se basa en la comparación entre los valores predichos por el cromosoma y los valores reales.
+
+Para evaluar la precisión de las predicciones, utilizamos el error cuadrático medio (RMSE, por sus siglas en inglés), una métrica ampliamente aceptada en problemas de regresión. El RMSE se calcula mediante la siguiente fórmula:
+
+\[
+\text{RMSE} = \sqrt{\frac{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}{N}}
+\]
+
+donde \( y_i \) representa los valores reales y \( \hat{y}_i \) las predicciones realizadas por el cromosoma, y \( N \) es el número total de datos.
+
+Una vez calculado el RMSE para un cromosoma específico, existen dos enfoques posibles para su utilización en la función de fitness: devolver el inverso del RMSE para maximizar el valor de la función de fitness, o devolver el RMSE directamente y minimizar su valor. En nuestro caso, hemos optado por la segunda opción, es decir, minimizar el RMSE.
+
+A continuación, describiremos el proceso de predicción utilizando los datos del cromosoma en cuestión, que es crucial para la evaluación de su fitness.
+
+\subsubsection{Predicción}
+En esta sección, explicaremos cómo obtener una predicción \(\hat{y}_i\) para un cromosoma específico utilizando datos de prueba concretos. Este proceso se repetirá para cada uno de los datos de prueba que deseamos evaluar. Dado que estamos abordando un problema de regresión no lineal, debemos elevar cada una de las variables de los datos de prueba \(x_j\) a un exponente \(e_j\) y multiplicarlas por un coeficiente \(c_j\), donde \(j\) representa los índices de todas las variables en la ecuación de regresión. 
+
+Posteriormente, sumamos estos términos junto con un último coeficiente, que actúa como término independiente, para obtener la predicción final. Utilizando los valores de un cromosoma determinado, la predicción \(\hat{y}_i\) se calcula de la siguiente manera:
+
+\[
+\hat{y}_i = \sum_{j=0}^{n} c_j x_j^{e_j} + c_{n+1}
+\]
+
+
+\subsubsection{Cruce de Cromosomas}
+El proceso de cruce de cromosomas tiene como objetivo combinar dos cromosomas parentales, eligiendo un punto de cruce de manera aleatoria. Una vez determinado el punto de cruce, se crean dos cromosomas hijos seleccionando una parte del cromosoma de cada padre. 
+
+Para decidir cuándo realizar el cruce, se utiliza una tasa de cruce, la cual es un valor entre 0 y 1. Se elige un número aleatorio, también entre 0 y 1, y la probabilidad de que este número sea menor que la tasa de cruce es precisamente la tasa de cruce. Por lo tanto, si el número aleatorio es mayor que la tasa de cruce, los cromosomas se devuelven sin cambios. 
+
+En caso de que se deba realizar el cruce, se genera aleatoriamente un punto de corte en los cromosomas parentales. En este punto, ambos cromosomas se dividen y se combinan emparejando una mitad de uno con la mitad complementaria del otro, y viceversa. Podemos ver este proceso ejemplificado en \figurename~\ref{fig:chromosome-crossover}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{image-chromosome-crossover.jpg}
+    \caption{Proceso de cruce ilustrado.}
+    \label{fig:chromosome-crossover}
+\end{figure}
+
+
+En nuestro caso, dado que manejamos dos listas, una de coeficientes y otra de exponentes, se generan dos puntos de corte y se realiza el cruce de la manera descrita anteriormente en ambas listas. Creando dos nuevos objetos Cromosoma, y devolviendo estos dos.
 
 
 
+\subsubsection{Mutación de Cromosomas}
+La mutación de cromosomas se realiza de manera aleatoria, similar al proceso de cruce de cromosomas. Este proceso utiliza una tasa de mutación, la cual es un valor entre 0 y 1. Para cada parámetro del cromosoma, se genera un número aleatorio, también entre 0 y 1. Si este número es menor que la tasa de mutación, se decide mutar el parámetro correspondiente.
 
-Por último, se debe hacer un uso correcto de las referencias bibliográficas,
-para que el lector pueda acceder a más información~\cite{b2}. Todas las
-referencias al final del documento deben ser citadas al menos una vez.
+Cuando un parámetro es seleccionado para mutación, se modifica sumándole un valor aleatorio dentro de un rango predeterminado. Este rango incluye números negativos, por lo que el parámetro puede incrementarse o disminuirse con igual probabilidad. 
+
+Este proceso se aplica a cada parámetro del cromosoma. Una vez realizado a todos estos, finaliza el proceso de mutación.
 
 
+\subsection{Algoritmo Genético}
+En esta sección, describimos el proceso completo del algoritmo genético, utilizando los componentes definidos anteriormente. El algoritmo comienza con la generación de una población inicial de un tamaño determinado. Cada cromosoma de la población es evaluado utilizando la función de fitness descrita previamente.
+
+Una vez que todos los cromosomas han sido evaluados, se ordenan de menor a mayor según su valor de fitness, y se seleccionan los mejores para formar la población de la siguiente generación. Con los cromosomas restantes, se procede de la siguiente manera:
+
+\subsubsection{Selección Mediante Torneo}
+Para seleccionar los padres de la siguiente generación, se utiliza un método de selección mediante torneo. Este proceso consiste en seleccionar aleatoriamente \(k\) cromosomas y escoger los dos con mejor fitness, es decir, los dos con el menor RMSE respecto a los datos reales.
+
+Una vez seleccionados los dos padres, se generan dos hijos para la siguiente generación utilizando el proceso de cruce explicado anteriormente. Posteriormente, estos hijos pasan por un proceso de mutación aleatoria. 
+
+Este ciclo se repite tantas veces como el número de iteraciones especificado. Al finalizar la última iteración, se devuelve el cromosoma con el menor RMSE como la solución final al problema.
 
 
-\subsection{Trabajo Relacionado}
+\subsection{Medidas para Mejorar la Eficiencia}
+Además de buscar el menor RMSE posible, también teníamos la intención de optimizar los tiempos de ejecución de nuestro algoritmo, de manera que pudiera llegar a soluciones esperadas en el menor tiempo posible. Para alcanzar este objetivo, hemos implementado varias medidas destinadas a mejorar la eficiencia del algoritmo. Estas medidas son:
 
-Se puede realizar un recorrido en la literatura sobre trabajos anteriores que
-estén relacionados y que sea por tanto interesante comentar aquí. Por supuesto,
-añadir las referencias bibliográficas correspondientes.
+\subsubsection{Porcentaje de Datos}
+En principio, cuantos más datos tengamos en nuestro conjunto de prueba, mejor, ya que esto proporcionará una mayor variedad en nuestro proceso de valoración y, en general, conducirá a una regresión más precisa. Sin embargo, al aumentar el número de casos de prueba, también aumenta el tiempo necesario para valorar cada cromosoma. 
+
+Con el fin de aprovechar las ventajas de tener un gran número de datos de prueba, pero reduciendo el costo computacional, proponemos la siguiente solución: introducir un nuevo parámetro, con un valor entre 0 y 1, que indique el porcentaje de datos a utilizar. Estos datos se seleccionarán de forma aleatoria para cada valoración de un cromosoma. 
+
+De esta manera, un cromosoma que progresa a través de distintas generaciones debido a su buen desempeño en los datos que le han tocado, será evaluado con diferentes subconjuntos de datos en cada iteración. Esto no solo asegura una evaluación más robusta, sino que también reduce significativamente el costo computacional de valorar un cromosoma.
+
+\subsubsection{Almacenamiento de la Valoración de un Cromosoma}
+Durante la ejecución del algoritmo genético, debemos ordenar todos los cromosomas de la población actual en función de su valoración. Estas valoraciones también se utilizan posteriormente en la selección por torneo.
+
+Inicialmente, la población se representaba como una lista de cromosomas, y el cálculo de la valoración se realizaba cada vez que era necesario obtener la valoración de un cromosoma. Este enfoque era extremadamente ineficiente.
+
+Para mejorar la eficiencia, propusimos cambiar esta lista de cromosomas por una lista en la que se almacenen pares \([\text{cromosoma}, \text{cromosoma.fitness()}]\). Consideramos varias opciones para implementar esta estructura, y finalmente optamos por utilizar una lista de listas. Aunque esta elección podría ser ligeramente menos eficiente que usar un diccionario o una lista de tuplas, vimos que la manipulación de listas era lo más comodo para nosotros. Las listas son variables mutables, lo que nos permite crear la población de la siguiente generación y realizar operaciones de mutación y cruce con facilidad. Al comienzo de cada nueva generación, podemos establecer las valoraciones utilizando nuevos datos de prueba, tal como se explicó anteriormente.
 
 
 \section{Metodología}
 
-Esta sección se dedica a la descripción del método implementado en el trabajo.
-Esta parte es la correspondiente a lo realmente desarrollado en el trabajo, y
-se puede emplear pseudocódigo (nunca código), esquemas, tablas, etc.
+En esta sección se presentan los pseudocódigos de cada una de las funciones que participan en el algoritmo genético desarrollado.
 
-\begin{figure}
-  \centering
-  \includegraphics{ejemplo}
-  \caption{Ejemplo de un pie de figura. Imagen con derechos Creative Commons}
-  \label{fig:ejemplo}
-\end{figure}
-
-A continuación, un ejemplo de uso de listas numeradas:
-\begin{enumerate}
-\item\label{item:dos-alumnos} \textit{Trabajos con dos alumnos:} poner nombre y
-  apellidos completos de cada uno, y correos electrónicos de contacto (a ser
-  posible de la Universidad de Sevilla). El orden de los alumnos se fijará por
-  orden alfabético según los apellidos.
-\item \textit{Trabajo con un autor:} cambiar la cabecera de la siguiente manera
-  \begin{enumerate}
-  \item \textit{Una sola columna:} solo se debe especificar un alumno.
-  \item \textit{Información a añadir:} la misma que la especificada en el
-    punto~\ref{item:dos-alumnos}.
-  \end{enumerate}
-\end{enumerate}
-
-Las figuras se deben mencionar en el texto, como la
-\figurename~\ref{fig:ejemplo}. También se pueden añadir ecuaciones, como la
-ecuación~\eqref{eq:ejemplo}.
-
-\begin{equation}
-  \label{eq:ejemplo}
-  a + b = \gamma
-\end{equation}
-
-Un ejemplo de pseudocódigo se puede observar en la
-\figurename~\ref{pcd:fitness}.
-
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{fitness}}(self, train\_data, data\_percentage) \\*
@@ -208,7 +236,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 \end{figure}
 
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{predict}}(\textit{self, datum}) \\*
@@ -236,7 +264,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 
 
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{crossover}}(\textit{self}, \textit{chromosomeToCrossWith}, \textit{cross\_rate}) \\*
@@ -273,7 +301,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 \end{figure}
 
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{mutate}}(\textit{self}, \textit{mutation\_rate}, \textit{mutation\_range}) \\*
@@ -297,7 +325,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 
 
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{run}}(\textit{self}) \\*
@@ -343,7 +371,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 \end{figure}
 
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{tournament\_selection}}(\textit{self}, \textit{k}) \\*
@@ -363,7 +391,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 
 
 
-\begin{figure}[t]
+\begin{figure}[h]
   \centering
   \begin{pseudo}*
     \hd{\fn{test}}(\textit{self}, \textit{chromosome}) \\*

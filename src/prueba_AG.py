@@ -21,16 +21,7 @@ def main(*args, **kwargs):
 	nombre_dataset_train 	= nombre_dataset + "_data/" + nombre_dataset + "_train.csv"
 	nombre_dataset_val 		= nombre_dataset + "_data/" + nombre_dataset + "_val.csv"
 
-	parameters = {
-		"housing": (36, 300),
-		"synt1": (20, 100),
-		"toy1": (200, 500)
-	}
-
 	seed = 123
-
-	if nombre_dataset not in parameters.keys():
-		raise ValueError(f"No contamos con los datos {nombre_dataset} de momento.")
 
 	# La clase AG debe estar implementada	
 	# (importe los ficheros necesarios antes de ejecutar las siguientes lineas)
@@ -42,9 +33,9 @@ def main(*args, **kwargs):
 		# semilla para numeros aleatorios
 		seed=seed, 
 		# numero de individuos
-		nInd = parameters.get(nombre_dataset, 50)[0], 
+		nInd = 50,
 		# maximo de iteraciones
-		maxIter = parameters.get(nombre_dataset, 500)[1]
+		maxIter = 300
 	)
 
 	# winner_chromosome, y_pred  = ag.run()
@@ -74,6 +65,8 @@ def main(*args, **kwargs):
 	r2 = r2_score(y_true, y_pred)
 	print(f'R2: {r2:.4f}')
 
+
+	# Guardamos en el log si hemos conseguido un nuevo record.
 	records(nombre_dataset.upper(), rmse, r2, fin-inicio, seed)
 
 

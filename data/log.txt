@@ -1,16 +1,16 @@
 RECORDS, BEST VALUES OBTAINED
 
 file: TOY1
-	rmse:	0.1307
-	r2:		0.9917
-	time:	44.68
+	rmse:	0.0702
+	r2:		0.9976
+	time:	14.36
 	seed:	123
 
 file: HOUSING
-	rmse:	0.7447
-	r2:		0.5870
-	time:	48.98
-	seed:	22
+	rmse:	0.7218
+	r2:		0.6120
+	time:	1753.61
+	seed:	123
 
 file: SYNT1
 	rmse:	216.7349

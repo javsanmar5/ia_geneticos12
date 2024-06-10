@@ -13,13 +13,6 @@ class AG():
     def __init__(self, datos_train: str, datos_test: str, seed: int, nInd: int, maxIter: int):
 
         random.seed(seed) # Generamos los números aleatorios con la semilla dada
-        # Orden de los parametros: tasa de mutación, tango de mutación, tasa de cruce,
-        # tasa de elitismo, rango inicial del cromosoma, porcentaje de datos, método.
-        parameters = {
-            "housing_data/housing_train.csv": (0.25, 0.6, 0.7, 0.2, 0.7, 0.1),
-            "synt1_data/synt1_train.csv": (0.2, 0.4, 0.8, 0.1, 1., 0.2),
-            "toy1_data/toy1_train.csv": (0.25, 0.6, 0.7, 0.2, 3., 1.)
-        }
 
         # Asignamos las variables
         self.train_data:            str = read_data(datos_train)
@@ -27,15 +20,14 @@ class AG():
         self.population_size:       int = nInd
         self.max_iterations:        int = maxIter
 
-        self.mutation_rate:         float = parameters.get(datos_train)[0]
-        self.mutation_range:        float = parameters.get(datos_train)[1]
-        self.cross_rate:            float = parameters.get(datos_train)[2]
-        self.elitism_rate:          float = parameters.get(datos_train)[3]
-        self.initial_range:         float = parameters.get(datos_train)[4]
-        self.data_percentage:       float = parameters.get(datos_train)[5]
+        self.mutation_rate:         float = 0.2
+        self.mutation_range:        float = 0.6
+        self.initial_range:         float = 1.
+        self.cross_rate:            float = 0.7
+        self.elitism_rate:          float = 0.2
 
         self.population: List[Chromosome] = [
-            [Chromosome(variables_amount=len(self.train_data[0]) - 1, initial_range = self.initial_range)]
+            [Chromosome(variables_amount=len(self.train_data[0]) - 1, initial_range=self.initial_range)]
             for _ in range(self.population_size)
         ]
 
@@ -52,7 +44,7 @@ class AG():
         elitism_count = int(self.elitism_rate * self.population_size)
         for generation in range(self.max_iterations):
 
-            self.population = [[pair[0], pair[0].fitness(self.train_data, self.data_percentage)] for pair in self.population]
+            self.population = [[pair[0], pair[0].fitness(self.train_data)] for pair in self.population]
             #Ordena la poblacion de cromosomas seleccionados segun la funcion de fitness de mayor a menor
             # self.population.sort(key=lambda chromo: chromo.fitness(self.train_data), reverse=False)
             self.population = (sorted(self.population, key=lambda x:x[1]))
@@ -73,9 +65,9 @@ class AG():
 
             best_fitness = self.population[0][1]
             self.population = next_generation
-            print(f'Generation {generation}: Best Fitness = {best_fitness}')
+            print(f'Generación {generation}: Mejor RMSE obtenido = {best_fitness}')
 
-        winner_chromosome = min(self.population, key=lambda chromo: chromo[0].fitness(self.train_data, self.data_percentage))[0]
+        winner_chromosome = min(self.population, key=lambda chromo: chromo[0].fitness(self.train_data))[0]
         
         return winner_chromosome, self.test(winner_chromosome)
 

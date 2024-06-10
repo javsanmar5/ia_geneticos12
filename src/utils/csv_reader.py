@@ -13,19 +13,22 @@ def read_data(filepath: str) -> List[Tuple[float]]:
 
     # Para evitar problemas de rutas relativas en distintos ordenadores y sistemas
     # utilizaremos la librería del sistema operativo
-    current_dir = os.path.dirname(__file__)  # Directorio actual de csv_reader.py
+    current_dir = os.path.dirname(__file__)  # Directorio en el que nos encontramos
     data_dir = os.path.abspath(os.path.join(current_dir, '..', '..', 'data'))
     full_filepath = os.path.join(data_dir, filepath)
 
-    with open(full_filepath, 'r') as file:
-        
-        lines = file.readlines()[1:]  # Saltar la cabecera
-        data = []
-        
-        for line in lines:
-            parts = tuple(map(float, line.strip().split(',')))
-            features = parts[:-1]
-            target = parts[-1]
-            data.append(parts)
+    try:
+        with open(full_filepath, 'r') as file:
+            
+            lines = file.readlines()[1:]  # Saltar la cabecera
+            data = []
+            
+            for line in lines:
+                parts = tuple(map(float, line.strip().split(',')))
+                features = parts[:-1]
+                target = parts[-1]
+                data.append(parts)
+    except:
+        raise ValueError(f"No contamos con los datos {filepath[:filepath.find("_data")]} de momento.")
 
     return data

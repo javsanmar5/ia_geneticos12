@@ -7,7 +7,7 @@ class Chromosome(AbstractChromosome):
 
     def __init__(self, coefficients: List[float] = None,
                  exponents: List[float] = None, 
-                 variables_amount: int = 0, 
+                 variables_amount: int = 0,
                  initial_range: float = 1.) -> None:
         '''
         La idea del cromosoma es ser una lista de tamaño 2*n
@@ -29,7 +29,7 @@ class Chromosome(AbstractChromosome):
             self.exponents:     List[float] = exponents
                 
 
-    def fitness(self, train_data: List[Tuple[float]], data_percentage: float = 1.) -> float:
+    def fitness(self, train_data: List[Tuple[float]]) -> float:
         # Valoraremos al cromosoma como la inversa de la distancia
         # entre el valor predicho y el target. 
         # Esta distancia la calcularemos con el MSE visto en la asignatura,
@@ -38,7 +38,7 @@ class Chromosome(AbstractChromosome):
         y_pred: List[float] = []
         y_true: List[float] = []
 
-        selected_data = random.sample(train_data, int(len(train_data) * data_percentage))
+        selected_data = random.sample(train_data, min(len(train_data), 1000))
 
         for datum in selected_data:
             y_pred.append(self.predict(datum))
@@ -62,14 +62,15 @@ class Chromosome(AbstractChromosome):
 
         for i in range(len(datum) - 1):
 
-            if datum[i] < 0.:
-                self.exponents[i] = round(self.exponents[i], 0)
-            elif datum[i] == 0.:
+            # if datum[i] < 0.:
+            #     self.exponents[i] = round(self.exponents[i], 0)
+            if datum[i] == 0.:
                 self.exponents[i] = abs(self.exponents[i])
 
-            exponent = self.exponents[i]
-                
-            prediction += self.coefficients[i] * (datum[i] ** exponent)
+            # value = -abs(datum[i] ** self.exponents[i]) if datum[i] < 0 else abs(datum[i] ** self.exponents[i])
+            value = (datum[i] ** self.exponents[i]).real
+            
+            prediction += self.coefficients[i] * value
 
         prediction += self.coefficients[-1]
         return prediction
@@ -111,14 +112,26 @@ class Chromosome(AbstractChromosome):
         # la tasa.
 
             
-        for i in range(len(self.exponents)):
-
-            random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
-            if random_number < mutation_rate: 
-
+        random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
+                
+        if random_number < mutation_rate: 
+            
+            for i in range(len(self.exponents)):
                 self.coefficients[i] += random.uniform(-mutation_range, mutation_range)
                 self.exponents[i] += random.uniform(-mutation_range, mutation_range)
 
-        random_number = random.random()
-        if random_number < mutation_rate: 
             self.coefficients[-1] += random.uniform(-mutation_range, mutation_range)
+
+
+        # for i in range(len(self.exponents)):
+
+        #     random_number = random.random() # Generamos un numero aleatorio entre 0 y 1
+        #     if random_number < mutation_rate: 
+
+        #         self.coefficients[i] += random.uniform(-mutation_range, mutation_range)
+
+        #     self.exponents[i] += random.uniform(-mutation_range, mutation_range)
+
+        # random_number = random.random()
+        # if random_number < mutation_rate: 
+        #     self.coefficients[-1] += random.uniform(-mutation_range, mutation_range)

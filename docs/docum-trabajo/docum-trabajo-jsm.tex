@@ -34,24 +34,24 @@
 
 \begin{document}
 
-\title{Algoritmos genéticos para problemas de regresión no lineal.}
+\title{Algoritmos genéticos para problemas de regresión no lineal}
 
 \author{
+  \IEEEauthorblockN{Javier Ruíz Garrido}
+  \IEEEauthorblockA{
+    \textit{Dpto. Ciencias de la Computación e Inteligencia Artificial}\\
+    \textit{Universidad de Sevilla}\\
+    Sevilla, España\\
+    2210jrg@gmail.com | javruigar2@alum.us.es}
+  
+  \and
+  
   \IEEEauthorblockN{Javier Santos Martín}
   \IEEEauthorblockA{
     \textit{Dpto. Ciencias de la Computación e Inteligencia Artificial}\\
     \textit{Universidad de Sevilla}\\
     Sevilla, España\\
     javier.jsm21@gmail.com | javsanmar5@alum.us.es}
-  
-  \and
-  
-  \IEEEauthorblockN{Javier Ruíz Garrido}
-  \IEEEauthorblockA{
-    \textit{Dpto. Ciencias de la Computación e Inteligencia Artificial}\\
-    \textit{Universidad de Sevilla}\\
-    Sevilla, España\\
-    jrg@gmail.com | javruigar2@alum.us.es}
 }
 
 \maketitle
@@ -102,6 +102,10 @@ Todo esto se desarrollará dentro de un algoritmo genético estándar, que inclu
 
 \subsection{Cromosoma}
 
+En el contexto de nuestro trabajo, el cromosoma se ha conceptualizado como una clase de Python. Para ello, se ha diseñado una clase abstracta denominada \textit{AbstractChromosome}, la cual establece los métodos fundamentales que debe poseer cualquier cromosoma. A partir de esta clase abstracta, se permite definir nuevas clases de cromosomas que extienden sus funcionalidades. En nuestro caso, hemos implementado la clase \textit{Chromosome(AbstractChromosome)}, la cual se ajusta a nuestros requerimientos, dado que podemos enmarcar todos los problemas de regresión no lineal en ella, sin tener que crear una clase distinta para cada fichero o problema a resolver.
+
+El modelado del cromosoma en nuestro caso incluye los siguientes aspectos:
+
 \subsubsection{Propiedades}
 \begin{itemize}
     \item \textbf{Lista de coeficientes:} Esta lista contiene \( n + 1 \) elementos de tipo \texttt{float}, donde \( n \) es el número de variables independientes. El elemento \( j \) de la lista representa el coeficiente de la variable \( x_j \), mientras que el último elemento representa el término independiente.
@@ -125,7 +129,20 @@ Obtenido:
 (0.8090169943749475+0.5877852522924731j)
 \end{verbatim}
 
-Para resolver este problema, hemos decidido redondear los exponentes a su parte entera en los casos donde surge esta dificultad. Esta decisión se tomó después de descartar otras opciones, como intentar modificar la fracción para garantizar que el denominador sea impar (lo cual hemos observado que no es efectivo por el error de Python) o alterar la base (representada por la variable \(x_j\)), lo cual consideramos completamente incorrecto. Modificar la base implicaría permitir exponentes que generan este problema y exigiría a quienes utilicen esta solución que ajusten sus variables para trabajar con números positivos. Además, sabemos que si alteramos la base, es decir, los datos de entrada, el valor esperado \(y_i\) ya no sería válido, dado que el dato de entrada no sería el original.
+Hemos planteado diversas opciones para la resolución de este problema, como intentar modificar la fracción para garantizar que el denominador sea impar (lo cual hemos observado que no es efectivo debido al error en Python) o alterar la base (representada por la variable \(x_j\)), lo cual consideramos completamente incorrecto. Modificar la base implicaría permitir exponentes que generan este problema y exigiría a quienes utilicen esta solución que ajusten sus variables para trabajar con números positivos. Además, sabemos que si alteramos la base, es decir, los datos de entrada, el valor esperado \(y_i\) ya no sería válido, dado que el dato de entrada no sería el original. Otra alternativa que inicialmente consideramos muy válida fue utilizar el módulo del resultado de la operación \(x_j^{e_j}\), puesto que el error de Python parece ser un problema de aproximación. Aquí podemos ver que el módulo del número complejo devuelto es el mismo módulo que el del valor esperado (1):
+\begin{verbatim}
+>>> base, exponent = -1, 0.2
+>>> base ** exponent
+(0.8090169943749475+0.5877852522924731j)
+>>> res = base ** exponent
+>>> res
+(0.8090169943749475+0.5877852522924731j)
+>>> abs(res)
+1.0
+\end{verbatim}
+Lo único que deberíamos realizar es multiplicar este valor por la función signo de la base (\(\text{sign}(x_j)\)).
+
+Aún con todo esto, la solución que a priori parece más sencilla y que mejores resultados nos ha ofrecido ha sido redondear el exponente a su parte entera siempre que: \(x_j < 0\) 
 
 
 
@@ -142,7 +159,6 @@ Para evaluar la precisión de las predicciones, utilizamos el error cuadrático 
 \text{RMSE} = \sqrt{\frac{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}{N}}
 \]
 
-donde \( y_i \) representa los valores reales y \( \hat{y}_i \) las predicciones realizadas por el cromosoma, y \( N \) es el número total de datos.
 
 Una vez calculado el RMSE para un cromosoma específico, existen dos enfoques posibles para su utilización en la función de fitness: devolver el inverso del RMSE para maximizar el valor de la función de fitness, o devolver el RMSE directamente y minimizar su valor. En nuestro caso, hemos optado por la segunda opción, es decir, minimizar el RMSE.
 
@@ -159,7 +175,9 @@ Posteriormente, sumamos estos términos junto con un último coeficiente, que ac
 
 
 \subsubsection{Cruce de Cromosomas}
-El proceso de cruce de cromosomas tiene como objetivo combinar dos cromosomas parentales, eligiendo un punto de cruce de manera aleatoria. Una vez determinado el punto de cruce, se crean dos cromosomas hijos seleccionando una parte del cromosoma de cada padre. 
+El proceso de cruce de cromosomas tiene como objetivo combinar dos cromosomas parentales, eligiendo uno o varios puntos de cruce de manera aleatoria. Una vez determinado el o los puntos de cruce, se crean dos cromosomas hijos seleccionando distintas parte de cada cromosoma padre. 
+
+Consideramos la posibilidad de emplear uno o dos puntos de cruce en este proceso. Para tomar esta decisión, consultamos investigaciones previas sobre algoritmos genéticos (véase ~\cite{b1}). Sin embargo, finalmente llegamos a la conclusión de utilizar únicamente un punto de cruce. Esta elección se basa en nuestra consideración de que este enfoque se ajusta mejor a la documentación proporcionada y es una visión más sencilla y suficientemente eficaz para el problema a resolver.
 
 Para decidir cuándo realizar el cruce, se utiliza una tasa de cruce, la cual es un valor entre 0 y 1. Se elige un número aleatorio, también entre 0 y 1, y la probabilidad de que este número sea menor que la tasa de cruce es precisamente la tasa de cruce. Por lo tanto, si el número aleatorio es mayor que la tasa de cruce, los cromosomas se devuelven sin cambios. 
 
@@ -179,19 +197,20 @@ En nuestro caso, dado que manejamos dos listas, una de coeficientes y otra de ex
 
 
 \subsubsection{Mutación de Cromosomas}
-La mutación de cromosomas se realiza de manera aleatoria, similar al proceso de cruce de cromosomas. Este proceso utiliza una tasa de mutación, la cual es un valor entre 0 y 1. Para cada parámetro del cromosoma, se genera un número aleatorio, también entre 0 y 1. Si este número es menor que la tasa de mutación, se decide mutar el parámetro correspondiente.
-
-Cuando un parámetro es seleccionado para mutación, se modifica sumándole un valor aleatorio dentro de un rango predeterminado. Este rango incluye números negativos, por lo que el parámetro puede incrementarse o disminuirse con igual probabilidad. 
-
-Este proceso se aplica a cada parámetro del cromosoma. Una vez realizado a todos estos, finaliza el proceso de mutación.
+De primeras, contemplamos que la mutación de cromosomas se llevara a cabo de manera aleatoria, siguiendo un proceso similar al de cruce de cromosomas, pero, en este caso, generando un número aleatorio por cada parámetro del cromosoma a mutar.
 
 
-\subsection{Algoritmo Genético}
+Generando un número con el que determinar si un parámetro ha de ser mutado o no; cuando es seleccionado para mutación, se modifica sumándole o restando un valor aleatorio dentro de un rango predeterminado. Este rango incluye números negativos, lo que permite tanto el incremento como la disminución del parámetro con igual probabilidad. Y repitiendo este proceso para cada parámetro del cromosoma hasta completar el proceso de mutación.
+
+Sin embargo, tras realizar diversas pruebas, observamos que se obtenían mejores resultados al generar un único número aleatorio y, en función de este, modificar de manera ligera todos los parámetros del cromosoma, en lugar de generar aleatoriedad para cada valor del cromosoma de forma individual. A pesar de que pueda parecer contraintuitivo, esta modificación no solo mejora el rendimiento, debido a la reducción en la generación de números y en las comprobaciones necesarias (lo cual es prácticamente insignificante), sino que también conduce a mejores resultados y a RMSE más reducidos.
+
+
+\subsection{Algoritmo genético}
 En esta sección, describimos el proceso completo del algoritmo genético, utilizando los componentes definidos anteriormente. El algoritmo comienza con la generación de una población inicial de un tamaño determinado. Cada cromosoma de la población es evaluado utilizando la función de fitness descrita previamente.
 
 Una vez que todos los cromosomas han sido evaluados, se ordenan de menor a mayor según su valor de fitness, y se seleccionan los mejores para formar la población de la siguiente generación. Con los cromosomas restantes, se procede de la siguiente manera:
 
-\subsubsection{Selección Mediante Torneo}
+\subsubsection{Selección mediante torneo}
 Para seleccionar los padres de la siguiente generación, se utiliza un método de selección mediante torneo. Este proceso consiste en seleccionar aleatoriamente \(k\) cromosomas y escoger los dos con mejor fitness, es decir, los dos con el menor RMSE respecto a los datos reales.
 
 Una vez seleccionados los dos padres, se generan dos hijos para la siguiente generación utilizando el proceso de cruce explicado anteriormente. Posteriormente, estos hijos pasan por un proceso de mutación aleatoria. 
@@ -199,15 +218,17 @@ Una vez seleccionados los dos padres, se generan dos hijos para la siguiente gen
 Este ciclo se repite tantas veces como el número de iteraciones especificado. Al finalizar la última iteración, se devuelve el cromosoma con el menor RMSE como la solución final al problema.
 
 
-\subsection{Medidas para Mejorar la Eficiencia}
+\subsection{Medidas para mejorar la eficiencia}
 Además de buscar el menor RMSE posible, también teníamos la intención de optimizar los tiempos de ejecución de nuestro algoritmo, de manera que pudiera llegar a soluciones esperadas en el menor tiempo posible. Para alcanzar este objetivo, hemos implementado varias medidas destinadas a mejorar la eficiencia del algoritmo. Estas medidas son:
 
-\subsubsection{Porcentaje de Datos}
-En principio, cuantos más datos tengamos en nuestro conjunto de prueba, mejor, ya que esto proporcionará una mayor variedad en nuestro proceso de valoración y, en general, conducirá a una regresión más precisa. Sin embargo, al aumentar el número de casos de prueba, también aumenta el tiempo necesario para valorar cada cromosoma. 
+\subsubsection{Conjunto de datos para evaluar un cromosoma}
 
-Con el fin de aprovechar las ventajas de tener un gran número de datos de prueba, pero reduciendo el costo computacional, proponemos la siguiente solución: introducir un nuevo parámetro, con un valor entre 0 y 1, que indique el porcentaje de datos a utilizar. Estos datos se seleccionarán de forma aleatoria para cada valoración de un cromosoma. 
+En principio, cuanto mayor sea el número de datos en nuestro conjunto de prueba, mejor será la valoración del cromosoma, ya que una mayor variedad de datos generalmente conduce a una regresión más precisa. Sin embargo, aumentar el número de casos de prueba también incrementa el tiempo necesario para evaluar cada cromosoma.
 
-De esta manera, un cromosoma que progresa a través de distintas generaciones debido a su buen desempeño en los datos que le han tocado, será evaluado con diferentes subconjuntos de datos en cada iteración. Esto no solo asegura una evaluación más robusta, sino que también reduce significativamente el costo computacional de valorar un cromosoma.
+Para aprovechar las ventajas de disponer de un gran número de datos de prueba y, al mismo tiempo, reducir el costo computacional, propusimos la siguiente solución: introducir un nuevo parámetro, con un valor entre 0 y 1, que indique el porcentaje de datos a utilizar en cada valoración. Estos datos se seleccionarán de forma aleatoria para cada evaluación de un cromosoma. Sin embargo, esta idea presentaba un problema: en conjuntos de datos con un gran volumen de información, esta solución era beneficiosa, pero en aquellos con menor cantidad de datos, se perdía demasiada diversidad. Por lo tanto, consideramos que la mejor solución, sin necesidad de ajustar este valor en función del tamaño del conjunto de prueba, fue establecer un límite máximo de datos de prueba para cada proceso de evaluación. En conjuntos de entrenamiento con un número de datos menor que el límite, se utilizarían todos; mientras que en ficheros extensos se seleccionaría un subconjunto del tamaño de este límite, variando en cada proceso de evaluación de un cromosoma. En nuestro caso, hemos determinado que este límite de datos sea de 500 muestras.
+
+De esta manera, un cromosoma que progresa a través de distintas generaciones debido a su buen desempeño en los datos asignados, será evaluado con diferentes subconjuntos de datos en cada iteración. Esto no solo asegura una evaluación más robusta, sino que también reduce significativamente el costo computacional de valorar un cromosoma.
+
 
 \subsubsection{Almacenamiento de la Valoración de un Cromosoma}
 Durante la ejecución del algoritmo genético, debemos ordenar todos los cromosomas de la población actual en función de su valoración. Estas valoraciones también se utilizan posteriormente en la selección por torneo.
@@ -457,29 +478,71 @@ Un ejemplo de pseudocódigo se puede observar en la
 
 \section{Resultados}
 
-En esta sección se detallarán tanto los experimentos realizados como los
-resultados conseguidos:
+En esta sección se presentan los resultados del entrenamiento del modelo de regresión no lineal utilizando algoritmos genéticos. Para ello, se emplearon tres conjuntos de datos distintos: \texttt{toy1}, \texttt{housing} y \texttt{synt1}. El modelo fue entrenado y evaluado de manera independiente para cada conjunto de datos, utilizando un archivo de prueba específico para cada caso.
+
+El tiempo de entrenamiento varía significativamente según el conjunto de datos aplicado. Los principales factores que influyen en el tiempo de entrenamiento son los siguientes:
+
 \begin{itemize}
-\item Los experimentos realizados, indicando razonadamente la configuración
-  empleada, qué se quiere determinar, y como se ha medido.
-\item Los resultados obtenidos en cada experimento, explicando en cada caso lo
-  que se ha conseguido.
-\item Análisis de los resultados, haciendo comparativas y obteniendo
-  conclusiones.
+    \item \textbf{Tamaño del conjunto de entrenamiento}: Este factor se refiere a la cantidad de datos disponibles para entrenar el modelo. En nuestro caso, su impacto es menor debido a la decisión de diseño de utilizar un conjunto de entrenamiento dinámico a lo largo de las diferentes generaciones del algoritmo, tal como se describe en la sección de mejoras de optimización.
+    
+    \item \textbf{Número de variables del conjunto de datos}: Este es un factor crucial, ya que un mayor número de variables ralentiza el proceso de predicción, el cual debe repetirse numerosas veces durante el entrenamiento. En particular, este factor es determinante para el tiempo de entrenamiento del conjunto de datos \texttt{synt1}.
 \end{itemize}
 
-Se pueden hacer uso de tablas, como el ejemplo de la tabla~\ref{tab:ejemplo}.
+Una vez entrenado el modelo, y antes de devolver el cromosoma óptimo, se evalúa su desempeño utilizando un conjunto de datos de prueba. Este conjunto permite determinar la eficacia del modelo. Tras esta evaluación, se selecciona el cromosoma ganador y se generan las predicciones \(\hat{y}_i\) para todos los datos del conjunto de prueba. A continuación, se calcula el Error Cuadrático Medio (RMSE) entre los resultados esperados y los obtenidos, así como el coeficiente de determinación (\(R^2\)).
 
-\begin{table}
-  \caption{Ejemplo de tabla}
-  \label{tab:ejemplo}
+Durante todo este proceso, tanto en la fase de entrenamiento como en la de prueba, se inicia un temporizador para medir el tiempo total empleado en el modelado de la solución, siendo este uno de los datos clave reportados.
+
+Es importante destacar que, aunque varios procesos dentro del algoritmo, como la mutación, el cruce y la asignación de datos a cada cromosoma, son inherentemente aleatorios, estos procesos se controlan mediante una semilla específica. Esta semilla, proporcionada por la librería de Python utilizada, asegura que el experimento es reproducible. Por lo tanto, si el programa se ejecuta múltiples veces sin cambiar ningún parámetro, los resultados serán consistentes. Para obtener diferentes resultados con los mismos parámetros, es necesario modificar la semilla.
+
+Los parámetros que influyen en los posibles resultados del modelo son los siguientes: tamaño de la población de cromosomas, número de iteraciones (aunque otra forma de limitar el proceso podría ser alcanzar un RMSE determinado o un tiempo máximo especificado), tasa de mutación, rango de mutación (el intervalo en el que se encuentra el valor que se va a sumar o restar a las posiciones del cromosoma), rango de valores iniciales, tasa de cruce y tasa de elitismo. En nuestro estudio, los valores seleccionados para estos parámetros son:
+
+\begin{table}[h]
+\centering
+\caption{Parámetros del modelo y sus valores.}
+\label{tab:parametros}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parámetro} & \textbf{Valor} \\
+\midrule
+Tamaño de la población         & 1 \\
+Número de iteraciones          & 1 \\
+Tasa de mutación               & 1 \\
+Rango de mutación              & 1 \\
+Rango de valores iniciales     & 1 \\
+Tasa de cruce                  & 1 \\
+Tasa de elitismo               & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+Es importante destacar que todos estos parámetros pueden afectar de manera tanto positiva como negativa a los resultados obtenidos. Lo que puede ser beneficioso para un conjunto de datos podría resultar perjudicial para otro. Por este motivo, hemos seleccionado valores que buscamos que sean adecuados para todos los conjuntos de datos empleados. No obstante, se recomienda ajustar estos parámetros según sea necesario para optimizar los resultados en un conjunto de datos específico.
+
+Con los parámetros establecidos, los mejores resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados}. Además, hemos implementado un sistema de registros que, de manera dinámica, actualiza los mejores valores obtenidos a medida que se prueban distintos parámetros o se cambian las semillas. Este registro puede consultarse en \textit{./data/log.txt}, partiendo del directorio raíz del proyecto una vez descomprimido.
+
+Para ejecutar el proyecto, ofrecemos dos opciones: 
+\begin{enumerate}
+    \item Lanzar el proyecto sin parámetros, utilizando el comando: \textit{python ./src/prueba\_AG.py}, que empleará el fichero predeterminado, en este caso \textit{toy1}. Este fichero predeterminado puede ser modificado manualmente en el archivo \textit{prueba\_AG.py}, como se indicó en la plantilla proporcionada.
+
+    \item Modificar el fichero de manera más conveniente añadiendo el nombre del fichero como argumento en la línea de comandos: \textit{python ./src/prueba\_AG.py nombre\_fichero}. Los nombres de fichero válidos son: \textit{toy1}, \textit{housing} y \textit{synt1}.
+\end{enumerate}
+
+
+Para cualquier duda sobre la instalación de dependencias o la configuración correcta del proyecto, consulte el archivo \textit{README.md} incluido en el directorio raíz del proyecto.
+
+\begin{table} [h]
+  \caption{Resultados obtenidos}
+  \label{tab:resultados}
   \centering
-  \begin{tabular}{ccc}
+  \begin{tabular}{cccc}
     \toprule
-    A & B & C \\
+     Fichero & Toy1 & Housing & Synt1 \\
     \midrule
-    1 & 2 & 3 \\
-    4 & 5 & 6 \\
+    RMSE & 0 & 0 & 0 \\
+    R2 & 0 & 0 & 0 \\
+    \midrule
+    Tiempo & 0 & 0 & 0 \\
+    Seed & 0 & 0 & 0 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -495,13 +558,17 @@ trabajo futuro.
 
 
 \begin{thebibliography}{00}
-\bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
-\bibitem{b2} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-\bibitem{b3} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
+\bibitem{b1}Mathew, Tom V. "Genetic algorithm." Report submitted at IIT Bombay 53 (2012), pp 7-8.
+
+
+A partir de aqui son los de ejemplo
+\bibitem{b} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
+\bibitem{b} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
+\bibitem{b} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
+\bibitem{b} K. Elissa, ``Title of paper if known,'' unpublished.
+\bibitem{b} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
+\bibitem{b} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
+\bibitem{b} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
 \end{thebibliography}
 
 

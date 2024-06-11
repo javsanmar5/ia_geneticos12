@@ -1,15 +1,27 @@
+#####################################
+#                                   #
+#      Trabajo realizado por:       #
+#    Javier Ruíz y Javier Santos    #
+#                                   #
+#   uvus: javruigar2; javsanmar5    #
+#                                   #
+#####################################
+
 import os
 
-def records(file: str, rmse: float, r2: float, time: float) -> None:
+def records(file: str, rmse: float, r2: float, time: float, seed: int) -> None:
     '''
-    Guardamos los datos obtenidos en caso de que sean 
-    mejores que los records existentes.
+    Guardamos los datos obtenidos en caso de que sean mejores 
+    que los records existentes. 
+    Si el fichero no existe creamos una nueva entrada en el 
+    registro, todos los datos se guardan en: './data/log.txt'.
 
-    :param file: Nombre del fichero con el que estamos trabajando
-    :param rmse: Nuevo rmse obtenido, aqui comprobamos que sea menor 
-    o no que el que ya poseemos
-    :param r2: Nuevo r2 obtenido
-    :param time: Nuevo tiempo obtenido
+    :param file: String | Nombre del fichero con el que estamos trabajando.
+    :param rmse: Float | Nuevo rmse obtenido, aqui comprobamos que sea menor 
+    o no que el que ya poseemos.
+    :param r2: Float | Nuevo r2 obtenido.
+    :param time: Float | Nuevo tiempo obtenido.
+    :param seed: Integer | Semilla utilizada.
     '''
 
     current_dir = os.path.dirname(__file__)
@@ -33,17 +45,20 @@ def records(file: str, rmse: float, r2: float, time: float) -> None:
                 lines[i + 1] = f"\trmse:\t{rmse:.4f}\n"
                 lines[i + 2] = f"\tr2:\t\t{r2:.4f}\n"
                 lines[i + 3] = f"\ttime:\t{time:.2f}\n"
+                lines[i + 4] = f"\tseed:\t{seed}\n"
             file_found = True
             break
 
     # Si no se encontró, es decir, estamos ante un nuevo
     # fichero, agregamos una nueva entrada
     if not file_found:
+        print(f"Nuevo fichero {file}. Datos añadidos a data/log.txt")
         new_entry = [
             f"\nfile: {file}\n",
             f"\trmse:\t{rmse:.4f}\n",
             f"\tr2:\t\t{r2:.4f}\n",
             f"\ttime:\t{time:.2f}\n"
+            f"\tseed:\t{seed}\n"
         ]
         lines.extend(new_entry)
 

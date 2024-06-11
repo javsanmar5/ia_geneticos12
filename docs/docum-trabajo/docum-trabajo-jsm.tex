@@ -58,41 +58,26 @@
 
 
 % Resumen
-\begin{abstract}
-  Escribir aquí dos párrafos indicando el objetivo principal del trabajo, y un
-  resumen de las conclusiones obtenidas. Cabe mencionar que este documento se
-  ha confeccionado siguiendo el formato de conferencias de IEEE (ver la guía
-  para autores para más información, existen plantillas para Word y \LaTeX).
-  Este documento se debe emplear como guía, se pueden añadir nuevas secciones
-  según sea necesario. Es importante dotarlo de un número razonable de
-  referencias bibliográficas.
+\begin{abstract}  
+El objetivo principal de este trabajo fue desarrollar y evaluar un modelo de regresión no lineal utilizando algoritmos genéticos. Estos algoritmos, inspirados en los procesos de selección natural y evolución biológica, fueron empleados para optimizar los parámetros del modelo, representados en forma de cromosomas que contienen coeficientes y exponentes. Se realizaron experimentos con tres conjuntos de datos distintos: \texttt{toy1}, \texttt{housing} y \texttt{synt1}, evaluando el desempeño del modelo mediante el cálculo del error cuadrático medio (RMSE) y el coeficiente de determinación (R2).
+
+El algoritmo creado cuenta con distintas ideas clave que fueron dando mejoras de rendimiento y precisión. Además, el control de la semilla de aleatoriedad y un sistema de registro de récords han sido muy importantes para garantizar los mejores resultados posibles del algoritmo. Entre las mejoras futuras, se sugiere paralelizar partes del código y aplicar este algoritmo en conjuntos de datos más grandes y complejos para validar su robustez y generalizabilidad.
 \end{abstract}
 
 
 % Palabras claves
 \begin{IEEEkeywords}
-  Inteligencia Artificial, otras palabras clave…
+    Algoritmo genético, regresión no lineal, cromosoma, mutación, cruce, elitismo.
 \end{IEEEkeywords}
 
 
 \section{Introducción}
 
-En esta sección se dedican varios párrafos para dar el contexto en el que se
-desarrolla el trabajo presentado. Normalmente se va desde lo más general a lo
-más preciso, para englobar el trabajo dentro de un ámbito concreto. Hay que
-recordar que se debe referenciar la información que se consiga de fuentes
-bibliográficas (artículos, libros, capítulos de libros, páginas web, apuntes,
-etc.). Para ello se añade el ítem correspondiente en el apartado de
-referencias, dotándolo de un número, y se añade la referencia al final de la
-frase o párrafo correspondiente~\cite{b1}. Si se realiza en Microsoft Word o
-LibreOffice, se puede hacer uso de \emph{referencias cruzadas} para actualizar
-la numeración de las referencias de forma automática en todo el documento.
+En el campo de la inteligencia artificial y el aprendizaje automático, los algoritmos genéticos se han destacado como una poderosa herramienta para resolver problemas de optimización y búsqueda en espacios complejos. Estos algoritmos, inspirados en los procesos de selección natural y evolución biológica, se aplican a una variedad de dominios, desde la ingeniería hasta la economía, proporcionando soluciones efectivas donde otros métodos tradicionales pueden fallar. Los problemas de regresión no lineal, en particular, presentan desafíos significativos debido a la naturaleza intrínseca de sus relaciones no lineales entre variables. La búsqueda de modelos precisos y eficientes para estas relaciones es crucial en muchas aplicaciones prácticas, como la predicción financiera, la modelización de sistemas físicos y la medicina.
 
-Después vienen un par de párrafos para dar un poco más de detalle sobre el
-trabajo realizado. Hay que indicar la problemática o el objetivo que se marca,
-y cómo se ha enfocado la solución propuesta en este trabajo. Finalmente, el
-último párrafo se dedica a comentar la estructura del documento por secciones,
-como el que sigue.
+La problemática central de este proyecto radica en la precisión insuficiente de los métodos tradicionales de regresión lineal para modelar relaciones no lineales complejas en conjuntos de datos. El objetivo es desarrollar un modelo de regresión no lineal más preciso mediante el uso de algoritmos genéticos. La solución implementada se basa en la creación de cromosomas que representan coeficientes y exponentes para cada característica del conjunto de datos. Estos cromosomas son evaluados utilizando el error cuadrático medio (RMSE) como métrica de aptitud. El algoritmo genético itera sobre una población de cromosomas, aplicando operadores de selección por torneo, cruce y mutación, para optimizar los parámetros del modelo. El enfoque permite explorar de manera eficiente el espacio de búsqueda y ajustar los coeficientes y exponentes para minimizar el RMSE, mejorando así la capacidad del modelo de predecir futuros ejemplos.
+
+El documento está estructurado de la siguiente manera: Tras la introducción, en la Sección II se describen los fundamentos teóricos con los que se ha trabajado el algoritmo genético y la regresión no lineal. La Sección III detalla la metodología propuesta, incluyendo la representación de los cromosomas, los operadores genéticos utilizados y el proceso de evaluación de los modelos. En la Sección IV se presentan los experimentos realizados y los resultados obtenidos, destacando las ventajas y limitaciones del enfoque propuesto. Finalmente, en la Sección V se presentan las conclusiones y se sugieren posibles líneas de investigación futura.
 
 \section{Preliminares}
 
@@ -240,7 +225,7 @@ Para aprovechar las ventajas de disponer de un gran número de datos de prueba y
 De esta manera, un cromosoma que progresa a través de distintas generaciones debido a su buen desempeño en los datos asignados, será evaluado con diferentes subconjuntos de datos en cada iteración. Esto no solo asegura una evaluación más robusta, sino que también reduce significativamente el costo computacional de valorar un cromosoma.
 
 
-\subsubsection{Almacenamiento de la Valoración de un Cromosoma}
+\subsubsection{Almacenamiento de la valoración de un cromosoma}
 Durante la ejecución del algoritmo genético, debemos ordenar todos los cromosomas de la población actual en función de su valoración. Estas valoraciones también se utilizan posteriormente en la selección por torneo.
 
 Inicialmente, la población se representaba como una lista de cromosomas, y el cálculo de la valoración se realizaba cada vez que era necesario obtener la valoración de un cromosoma. Este enfoque era extremadamente ineficiente.
@@ -528,14 +513,22 @@ Tasa de elitismo               & 0.2 \\
 
 Es importante destacar que todos estos parámetros pueden afectar de manera tanto positiva como negativa a los resultados obtenidos. Lo que puede ser beneficioso para un conjunto de datos podría resultar perjudicial para otro. Por este motivo, hemos seleccionado valores que buscamos que sean adecuados para todos los conjuntos de datos empleados. No obstante, se recomienda ajustar estos parámetros según sea necesario para optimizar los resultados en un conjunto de datos específico. Estos parámetros pueden ser establecidos al crear la instancia del \texttt{AG} mediante los \texttt{**kwargs} del constructor.
 
-Con los parámetros establecidos, los mejores resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados}. El tiempo del algoritmo depende de, entre otras cosas, el equipo en el que se prueba (tanto hardware como software); en nuestro caso lo hemos probado en:
+El tiempo del algoritmo depende de, entre otras cosas, el equipo en el que se prueba (tanto hardware como software); en nuestro caso lo hemos probado en dos sistemas, estos son:
+\textbf{Sistema 1}
 \begin{itemize}
     \item \textbf{CPU}: \textit{AMD Ryzen 7 7000 Series}
-    \item \textbf{GPU}: \textit{GPU incorporada en el procesador}
     \item \textbf{Sistema operativo}: \textit{Linux Fedora}
     \item \textbf{Terminal}: \textit{Warp} (Recomendamos lanzarlo desde una terminal lo más optimizada posible, en lugar de la incorporada en un IDE).
-    
 \end{itemize}
+
+\textbf{Sistema 2}
+\begin{itemize}
+    \item \textbf{CPU}: \textit{Intel i7 10510U}
+    \item \textbf{Sistema operativo}: \textit{Windows 11}
+    \item \textbf{Terminal}: \textit{Powershell}
+\end{itemize}
+
+Con los parámetros establecidos, los resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados1} para el primer sistema y en la Tabla ~\ref{tab:resultados2} para el segundo. 
 
 Además, hemos implementado un sistema de registros que, de manera dinámica, actualiza los mejores valores obtenidos a medida que se prueban distintos parámetros o se cambian las semillas. Este registro puede consultarse en \textit{./data/log.txt}, partiendo del directorio raíz del proyecto una vez descomprimido.
 
@@ -551,8 +544,25 @@ Para cualquier duda sobre la instalación de dependencias o la configuración co
 
 
 \begin{table} [h]
-  \caption{Resultados obtenidos}
-  \label{tab:resultados}
+  \caption{Resultados obtenidos sistema 1}
+  \label{tab:resultados1}
+  \centering
+  \begin{tabular}{cccc}
+    \toprule
+     Fichero & Toy1 & Housing & Synt1 \\
+    \midrule
+    RMSE & 0.3417 & 0.7564 & 190.8364 \\
+    R2 & 0.9436 & 0.5739 & -0.0474 \\
+    \midrule
+    Tiempo & 8.32 & 20.61 & 160.97 \\
+    Seed & 123 & 124 & 123 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table} [h]
+  \caption{Resultados obtenidos sistema 2}
+  \label{tab:resultados1}
   \centering
   \begin{tabular}{cccc}
     \toprule
@@ -570,25 +580,15 @@ Para cualquier duda sobre la instalación de dependencias o la configuración co
 
 \section{Conclusiones}
 
-Finalmente, se dedica la última sección para indicar las conclusiones obtenidas
-del trabajo. Se puede dedicar un párrafo para realizar un resumen sucinto del
-trabajo, con los experimentos y resultados. Seguidamente, uno o dos párrafos
-con conclusiones. Se suele dedicar un párrafo final con ideas de mejora y
-trabajo futuro.
+En este proyecto, se ha desarrollado y evaluado un modelo de regresión no lineal utilizando algoritmos genéticos. La metodología incluyó la representación de coeficientes y exponentes en cromosomas, la aplicación de operadores genéticos como mutación y cruce, y la evaluación de la aptitud utilizando el error cuadrático medio (RMSE). Se realizaron experimentos con tres conjuntos de datos distintos: \texttt{toy1}, \texttt{housing} y \texttt{synt1}. Los resultados mostraron una mejora significativa en la precisión de las predicciones al optimizar el manejo de los números complejos con el uso de los modulos de estos, y en la velocidad de rendimiento al usar un límite de ejemplos en el entrenamiento y el almacenamiento de la valoracion de los cromosomas durante el algoritmo.
+
+Los experimentos demostraron que el tiempo de entrenamiento varía según el tamaño del conjunto de datos y el número de variables. En particular, el conjunto de datos \texttt{synt1} presentó mayores desafíos debido a su complejidad, por lo que cualquier cambio podía suponer una diferencia notable en los resultados de este fichero. Para poder obtener los mejores resultados posibles, se llevo a cabo la implementación de un sistema de registro de records además del control de la semilla de aleatoriedad que aseguraron la reproducibilidad de los resultados más óptimos.
+
+Para futuros trabajos, se sugiere una serie de mejoras y exploraciones adicionales. Entre estas mejoras, la paralelización de partes del código podría mejorar significativamente el rendimiento del algoritmo genético. La optimización de parámetros del algoritmo genético, como las tasas de mutación y cruce, y la incorporación de métodos avanzados de selección también podría conducir a mejoras adicionales en la precisión y eficiencia del modelo. Finalmente, sería beneficioso explorar la aplicación de este enfoque en otros dominios y con conjuntos de datos más grandes y complejos para validar su generalizabilidad y robustez.
 
 
 \begin{thebibliography}{00}
 \bibitem{b1}Mathew, Tom V. "Genetic algorithm." Report submitted at IIT Bombay 53 (2012), pp 7-8.
-
-
-A partir de aqui son los de ejemplo
-\bibitem{b} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
-\bibitem{b} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-\bibitem{b} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-\bibitem{b} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
 \end{thebibliography}
 
 

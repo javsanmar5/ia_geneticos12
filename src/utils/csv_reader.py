@@ -1,14 +1,16 @@
-from chromosomes.Chromosome import Chromosome
 from typing import List, Tuple
 
 import os
 
 def read_data(filepath: str) -> List[Tuple[float]]:
     '''
-    Lee el fichero csv y lo convierte en una lista de cromosomas
+    Lee el fichero csv y lo convierte en una lista de tuplas 
+    para poder trabajar con los datos de forma cómoda.
+    La lista resultante está compuesta por tuplas en la que
+    cada tupla es un dato del conjunto y sus valores son floats.
     
-    :param filepath: Ruta del fichero a leer
-    :return: Lista de cromosomas
+    :param filepath: String | Ruta del fichero a leer.
+    :return: List[Tuple[Float]] | Lista de datos parseados.
     '''
 
     # Para evitar problemas de rutas relativas en distintos ordenadores y sistemas
@@ -25,10 +27,9 @@ def read_data(filepath: str) -> List[Tuple[float]]:
             
             for line in lines:
                 parts = tuple(map(float, line.strip().split(',')))
-                features = parts[:-1]
-                target = parts[-1]
                 data.append(parts)
-    except:
+
+    except: # Controlar error en caso de no contar con los datos a leer
         raise ValueError(f"No contamos con los datos {filepath[:filepath.find("_data")]} de momento.")
 
     return data

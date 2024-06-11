@@ -3,47 +3,44 @@ from typing import List
 
 # Esta es una clase abstracta por lo que los metodos definidos 
 # en esta no tienen definida una logica, su proposito es ser
-# utilizados en las extensiones de esta clase abstracta.
+# utilizados en las extensiones de esta.
 class AbstractChromosome(ABC):
 
     @abstractmethod
     def fitness(self) -> float:
         '''
-        Se realizará la valoración del cromosoma
+        Se realizará la valoración del cromosoma.
         
-        :param self: Cromosoma a evaular
-        :return: Valoración del cromosoma, double.
+        :param self: AbstractChromosome | Instancia de la clase a evaular.
+        :return: Float | Valoración del cromosoma.
         '''
         pass
 
+    @staticmethod
     @abstractmethod
-    def crossover(self, to_cross_with: 'AbstractChromosome') -> List['AbstractChromosome']:
+    def crossover(parent1: 'AbstractChromosome', parent2: 'AbstractChromosome',
+                  cross_rate: float) -> List['AbstractChromosome']:
         '''
-        Generamos el cruce entre una pareja de cromosomas
+        Generamos el cruce entre una pareja de cromosomas padres con
+        la probabilidad recibida como parametro.
+        Devolvemos dos cromosomas hijos cruzados si se da la probabilidad.
+        En caso contrario devolvemos los dos padres.
 
-        :param self: Cromosoma al que se le aplica el cruce  
-        :param to_cross_with: Cromosoma con el que se cruza 
-        :return: Lista de cromosomas hijos cruzados con la información de los padres
+        :param parent1: AbstractChromosome | Instancia del primer padre.  
+        :param parent2: AbstractChromosome | Instancia del segundo padre. 
+        :param cross_rate: float | Probabilidad de que ocurra el cruce.
+        :return: List[AbstractChromosome] | Lista de cromosomas hijos cruzados con la 
+        información de los padres o los padres en su defecto.
         '''
         pass
 
     @abstractmethod
     def mutate(self, mutation_rate: float) -> None:
         '''
-        Generamos la mutación aleatoria de un cromosoma
+        Generamos la mutación aleatoria de un cromosoma.
         
-        :param self: Cromosoma a mutar.
-        :param mutation_rate: Ratio de mutación.
+        :param self: AbstractChromosome | Instancia del cromosoma a mutar.
+        :param mutation_rate: Float | Ratio de mutación.
         '''
         pass
-
-
-    # No sé si será necesario el uso de estos dos métodos:
-    # @abstractmethod
-    # def to_genotype(self) -> List[float]:
-    #     pass
-
-    # @abstractmethod
-    # def from_genotype(self, genotype: List[float]) -> None:
-    #     pass
         

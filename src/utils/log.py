@@ -2,14 +2,17 @@ import os
 
 def records(file: str, rmse: float, r2: float, time: float, seed: int) -> None:
     '''
-    Guardamos los datos obtenidos en caso de que sean 
-    mejores que los records existentes.
+    Guardamos los datos obtenidos en caso de que sean mejores 
+    que los records existentes. 
+    Si el fichero no existe creamos una nueva entrada en el 
+    registro, todos los datos se guardan en: './data/log.txt'.
 
-    :param file: Nombre del fichero con el que estamos trabajando
-    :param rmse: Nuevo rmse obtenido, aqui comprobamos que sea menor 
-    o no que el que ya poseemos
-    :param r2: Nuevo r2 obtenido
-    :param time: Nuevo tiempo obtenido
+    :param file: String | Nombre del fichero con el que estamos trabajando.
+    :param rmse: Float | Nuevo rmse obtenido, aqui comprobamos que sea menor 
+    o no que el que ya poseemos.
+    :param r2: Float | Nuevo r2 obtenido.
+    :param time: Float | Nuevo tiempo obtenido.
+    :param seed: Integer | Semilla utilizada.
     '''
 
     current_dir = os.path.dirname(__file__)

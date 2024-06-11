@@ -115,7 +115,7 @@ El modelado del cromosoma en nuestro caso incluye los siguientes aspectos:
 Aunque, a priori, todos los elementos de ambas listas no tienen restricciones en cuanto a los valores que pueden adoptar, existen dos situaciones que podrían limitar estos valores:
 
 
-1. \textbf{Variable \( x_i \) negativa:} En este caso, el exponente de la función no puede asumir valores fraccionarios cuyo denominador sea par, es decir, de la forma \( k/m \) donde \( m \) es par, en el ámbito de los números reales. Este hecho plantea un problema en Python, ya que cualquier número negativo elevado a una potencia fraccionaria, ya sea con un denominador par o impar, resulta en un número complejo. Esto no es deseable, dado que estamos trabajando en el conjunto de los números reales \( \mathbb{R} \). Podemos ver este fallo de Python ejemplificado a continuación, donde se eleva un número negativo \( -1 \) a un número fraccionario con denominador impar \( 0.2 = \frac{1}{5} \), lo que resulta en la raíz quinta de \(-1\), que es igual a \(-1\):
+1. \textbf{Variable \( x_i \) negativa:} En este caso, el exponente de la función no puede asumir valores fraccionarios cuyo denominador sea par, es decir, de la forma \( k/m \) donde \( m \) es par, en el ámbito de los números reales. A priori, este sería el único problema, pero obtenemos otro por la forma de trabajar de Python con las potencias fraccionarias: cualquier número negativo elevado a una potencia fraccionaria, ya sea con un denominador par o impar, resulta en un número complejo. Esto no es deseable, dado que estamos trabajando en el conjunto de los números reales \( \mathbb{R} \). Podemos ver este fallo de Python ejemplificado a continuación, donde se eleva un número negativo \( -1 \) a un número fraccionario con denominador impar \( 0.2 = \frac{1}{5} \), lo que resulta en la raíz quinta de \(-1\), que es igual a \(-1\):
 
 Esperado:
 \[
@@ -129,7 +129,11 @@ Obtenido:
 (0.8090169943749475+0.5877852522924731j)
 \end{verbatim}
 
-Hemos planteado diversas opciones para la resolución de este problema, como intentar modificar la fracción para garantizar que el denominador sea impar (lo cual hemos observado que no es efectivo debido al error en Python) o alterar la base (representada por la variable \(x_j\)), lo cual consideramos completamente incorrecto. Modificar la base implicaría permitir exponentes que generan este problema y exigiría a quienes utilicen esta solución que ajusten sus variables para trabajar con números positivos. Además, sabemos que si alteramos la base, es decir, los datos de entrada, el valor esperado \(y_i\) ya no sería válido, dado que el dato de entrada no sería el original. Otra alternativa que inicialmente consideramos muy válida fue utilizar el módulo del resultado de la operación \(x_j^{e_j}\), puesto que el error de Python parece ser un problema de aproximación. Aquí podemos ver que el módulo del número complejo devuelto es el mismo módulo que el del valor esperado (1):
+Hemos planteado diversas opciones para la resolución de este problema, como intentar modificar la fracción para garantizar que el denominador sea impar (lo cual hemos observado que no es efectivo debido al error en Python) o alterar la base (representada por la variable \(x_j\)), lo cual consideramos completamente incorrecto. Modificar la base implicaría permitir exponentes que generan este problema y exigiría a quienes utilicen esta solución que ajusten sus variables para trabajar con números positivos. Además, sabemos que si alteramos la base, es decir, los datos de entrada, el valor esperado \(y_i\) ya no sería válido, dado que el dato de entrada no sería el original. 
+
+
+La alternativa seleccionada como solución al problema consiste en utilizar el módulo del resultado de la operación \(x_j^{e_j}\), ya que el error en Python parece ser un problema de aproximación. A continuación, se muestra que el módulo del número complejo devuelto es el mismo que el módulo del valor esperado (1):
+
 \begin{verbatim}
 >>> base, exponent = -1, 0.2
 >>> base ** exponent
@@ -140,12 +144,18 @@ Hemos planteado diversas opciones para la resolución de este problema, como int
 >>> abs(res)
 1.0
 \end{verbatim}
-Lo único que deberíamos realizar es multiplicar este valor por la función signo de la base (\(\text{sign}(x_j)\)).
 
-Aún con todo esto, la solución que a priori parece más sencilla y que mejores resultados nos ha ofrecido ha sido redondear el exponente a su parte entera siempre que: \(x_j < 0\) 
+Lo único que se requiere es multiplicar este valor por la función signo de la base (\(\text{sign}(x_j)\)). Esto se justifica de la siguiente manera: en el contexto de los números complejos, el número de soluciones a una raíz de índice \(i\) es igual a \(i\), y todas estas soluciones comparten una característica común: el módulo de estas soluciones es idéntico, y todas están espaciadas por el mismo ángulo entre ellas: \(\frac{360}{i}\). Véase la imagen \figurename~\ref{fig:roots_example}.
+
+Esta solución ha proporcionado, además, los mejores resultados en nuestras pruebas.
 
 
-
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{image-roots-example.jpg}
+    \caption{Ejemplificación de las soluciones complejas a una raíz.}
+    \label{fig:roots_example}
+\end{figure}
 
 2. \textbf{Variable \( x_i \) igual a cero:} Aquí, el problema surge con los exponentes negativos, pues esta operación está indeterminada. Por tanto, para resolver este problema, utilizamos el valor absoluto del exponente, ya que al saber que la función a interpolar está definida en \( x_i = 0 \), podemos afirmar que \( e_j > 0 \).
 
@@ -504,21 +514,30 @@ Los parámetros que influyen en los posibles resultados del modelo son los sigui
 \toprule
 \textbf{Parámetro} & \textbf{Valor} \\
 \midrule
-Tamaño de la población         & 1 \\
-Número de iteraciones          & 1 \\
-Tasa de mutación               & 1 \\
-Rango de mutación              & 1 \\
-Rango de valores iniciales     & 1 \\
-Tasa de cruce                  & 1 \\
-Tasa de elitismo               & 1 \\
+Tamaño de la población         & 50 \\
+Número de iteraciones          & 300 \\
+Tasa de mutación               & 0.2 \\
+Rango de mutación              & 0.6 \\
+Rango de valores iniciales     & 1.0 \\
+Tasa de cruce                  & 0.7 \\
+Tasa de elitismo               & 0.2 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
-Es importante destacar que todos estos parámetros pueden afectar de manera tanto positiva como negativa a los resultados obtenidos. Lo que puede ser beneficioso para un conjunto de datos podría resultar perjudicial para otro. Por este motivo, hemos seleccionado valores que buscamos que sean adecuados para todos los conjuntos de datos empleados. No obstante, se recomienda ajustar estos parámetros según sea necesario para optimizar los resultados en un conjunto de datos específico.
+Es importante destacar que todos estos parámetros pueden afectar de manera tanto positiva como negativa a los resultados obtenidos. Lo que puede ser beneficioso para un conjunto de datos podría resultar perjudicial para otro. Por este motivo, hemos seleccionado valores que buscamos que sean adecuados para todos los conjuntos de datos empleados. No obstante, se recomienda ajustar estos parámetros según sea necesario para optimizar los resultados en un conjunto de datos específico. Estos parámetros pueden ser establecidos al crear la instancia del \texttt{AG} mediante los \texttt{**kwargs} del constructor.
 
-Con los parámetros establecidos, los mejores resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados}. Además, hemos implementado un sistema de registros que, de manera dinámica, actualiza los mejores valores obtenidos a medida que se prueban distintos parámetros o se cambian las semillas. Este registro puede consultarse en \textit{./data/log.txt}, partiendo del directorio raíz del proyecto una vez descomprimido.
+Con los parámetros establecidos, los mejores resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados}. El tiempo del algoritmo depende de, entre otras cosas, el equipo en el que se prueba (tanto hardware como software); en nuestro caso lo hemos probado en:
+\begin{itemize}
+    \item \textbf{CPU}: \textit{AMD Ryzen 7 7000 Series}
+    \item \textbf{GPU}: \textit{GPU incorporada en el procesador}
+    \item \textbf{Sistema operativo}: \textit{Linux Fedora}
+    \item \textbf{Terminal}: \textit{Warp} (Recomendamos lanzarlo desde una terminal lo más optimizada posible, en lugar de la incorporada en un IDE).
+    
+\end{itemize}
+
+Además, hemos implementado un sistema de registros que, de manera dinámica, actualiza los mejores valores obtenidos a medida que se prueban distintos parámetros o se cambian las semillas. Este registro puede consultarse en \textit{./data/log.txt}, partiendo del directorio raíz del proyecto una vez descomprimido.
 
 Para ejecutar el proyecto, ofrecemos dos opciones: 
 \begin{enumerate}
@@ -530,6 +549,7 @@ Para ejecutar el proyecto, ofrecemos dos opciones:
 
 Para cualquier duda sobre la instalación de dependencias o la configuración correcta del proyecto, consulte el archivo \textit{README.md} incluido en el directorio raíz del proyecto.
 
+
 \begin{table} [h]
   \caption{Resultados obtenidos}
   \label{tab:resultados}
@@ -538,11 +558,11 @@ Para cualquier duda sobre la instalación de dependencias o la configuración co
     \toprule
      Fichero & Toy1 & Housing & Synt1 \\
     \midrule
-    RMSE & 0 & 0 & 0 \\
-    R2 & 0 & 0 & 0 \\
+    RMSE & 0.3417 & 0.7564 & 190.8364 \\
+    R2 & 0.9436 & 0.5739 & -0.0474 \\
     \midrule
-    Tiempo & 0 & 0 & 0 \\
-    Seed & 0 & 0 & 0 \\
+    Tiempo & 8.32 & 20.61 & 160.97 \\
+    Seed & 123 & 124 & 123 \\
     \bottomrule
   \end{tabular}
 \end{table}

@@ -1,3 +1,12 @@
+#####################################
+#                                   #
+#      Trabajo realizado por:       #
+#    Javier Ruíz y Javier Santos    #
+#                                   #
+#   uvus: javruigar2; javsanmar5    #
+#                                   #
+#####################################
+
 from chromosomes.AbstractChromosome import AbstractChromosome
 from sklearn.metrics import root_mean_squared_error
 from typing import List, Tuple
@@ -60,7 +69,7 @@ class Chromosome(AbstractChromosome):
 
         # Utilizamos la función de sklearn para calcular el RMSE.
         rmse = root_mean_squared_error(expected, predicted)
-
+        
         return rmse
     
     

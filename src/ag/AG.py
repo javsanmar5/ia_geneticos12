@@ -1,4 +1,11 @@
-# Trabajo realizado por: Javier Ruíz, Javier Santos 
+#####################################
+#                                   #
+#      Trabajo realizado por:       #
+#    Javier Ruíz y Javier Santos    #
+#                                   #
+#   uvus: javruigar2; javsanmar5    #
+#                                   #
+#####################################
 
 from chromosomes.Chromosome import Chromosome
 from utils.csv_reader import *

@@ -1,3 +1,12 @@
+#####################################
+#                                   #
+#      Trabajo realizado por:       #
+#    Javier Ruíz y Javier Santos    #
+#                                   #
+#   uvus: javruigar2; javsanmar5    #
+#                                   #
+#####################################
+
 from typing import List, Tuple
 
 import os

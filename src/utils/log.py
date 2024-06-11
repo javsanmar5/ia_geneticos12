@@ -1,3 +1,12 @@
+#####################################
+#                                   #
+#      Trabajo realizado por:       #
+#    Javier Ruíz y Javier Santos    #
+#                                   #
+#   uvus: javruigar2; javsanmar5    #
+#                                   #
+#####################################
+
 import os
 
 def records(file: str, rmse: float, r2: float, time: float, seed: int) -> None:

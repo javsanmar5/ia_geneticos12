@@ -3,6 +3,9 @@
 % Escritura mejorada de fórmulas matemáticas
 \usepackage{amsmath}
 
+\usepackage{float}
+
+
 % Inserción de gráficos
 \usepackage{graphicx}
 
@@ -58,8 +61,8 @@
 
 
 % Resumen
-\begin{abstract}
-  El objetivo principal de este trabajo fue desarrollar y evaluar un modelo de regresión no lineal utilizando algoritmos genéticos. Estos algoritmos, inspirados en los procesos de selección natural y evolución biológica, fueron empleados para optimizar los parámetros del modelo, representados en forma de cromosomas que contienen coeficientes y exponentes. Se realizaron experimentos con tres conjuntos de datos distintos: \texttt{toy1}, \texttt{housing} y \texttt{synt1}, evaluando el desempeño del modelo mediante el cálculo del error cuadrático medio (RMSE) y el coeficiente de determinación (R2).
+\begin{abstract}  
+El objetivo principal de este trabajo fue desarrollar y evaluar un modelo de regresión no lineal utilizando algoritmos genéticos. Estos algoritmos, inspirados en los procesos de selección natural y evolución biológica, fueron empleados para optimizar los parámetros del modelo, representados en forma de cromosomas que contienen coeficientes y exponentes. Se realizaron experimentos con tres conjuntos de datos distintos: \texttt{toy1}, \texttt{housing} y \texttt{synt1}, evaluando el desempeño del modelo mediante el cálculo del error cuadrático medio (RMSE) y el coeficiente de determinación (R2).
 
 El algoritmo creado cuenta con distintas ideas clave que fueron dando mejoras de rendimiento y precisión. Además, el control de la semilla de aleatoriedad y un sistema de registro de récords han sido muy importantes para garantizar los mejores resultados posibles del algoritmo. Entre las mejoras futuras, se sugiere paralelizar partes del código y aplicar este algoritmo en conjuntos de datos más grandes y complejos para validar su robustez y generalizabilidad.
 \end{abstract}
@@ -67,30 +70,20 @@ El algoritmo creado cuenta con distintas ideas clave que fueron dando mejoras de
 
 % Palabras claves
 \begin{IEEEkeywords}
-  Algoritmo genético, regresión no lineal, cromosoma, mutación, cruce, elitismo.
+    Algoritmo genético, regresión no lineal, cromosoma, mutación, cruce, elitismo.
 \end{IEEEkeywords}
 
 
 \section{Introducción}
 
-En esta sección se dedican varios párrafos para dar el contexto en el que se
-desarrolla el trabajo presentado. Normalmente se va desde lo más general a lo
-más preciso, para englobar el trabajo dentro de un ámbito concreto. Hay que
-recordar que se debe referenciar la información que se consiga de fuentes
-bibliográficas (artículos, libros, capítulos de libros, páginas web, apuntes,
-etc.). Para ello se añade el ítem correspondiente en el apartado de
-referencias, dotándolo de un número, y se añade la referencia al final de la
-frase o párrafo correspondiente~\cite{b1}. Si se realiza en Microsoft Word o
-LibreOffice, se puede hacer uso de \emph{referencias cruzadas} para actualizar
-la numeración de las referencias de forma automática en todo el documento.
+En el campo de la inteligencia artificial y el aprendizaje automático, los algoritmos genéticos se han destacado como una poderosa herramienta para resolver problemas de optimización y búsqueda en espacios complejos. Estos algoritmos, inspirados en los procesos de selección natural y evolución biológica, se aplican a una variedad de dominios, desde la ingeniería hasta la economía, proporcionando soluciones efectivas donde otros métodos tradicionales pueden fallar. Los problemas de regresión no lineal, en particular, presentan desafíos significativos debido a la naturaleza intrínseca de sus relaciones no lineales entre variables. La búsqueda de modelos precisos y eficientes para estas relaciones es crucial en muchas aplicaciones prácticas, como la predicción financiera, la modelización de sistemas físicos y la medicina.
 
-Después vienen un par de párrafos para dar un poco más de detalle sobre el
-trabajo realizado. Hay que indicar la problemática o el objetivo que se marca,
-y cómo se ha enfocado la solución propuesta en este trabajo. Finalmente, el
-último párrafo se dedica a comentar la estructura del documento por secciones,
-como el que sigue.
+La problemática central de este proyecto radica en la precisión insuficiente de los métodos tradicionales de regresión lineal para modelar relaciones no lineales complejas en conjuntos de datos. El objetivo es desarrollar un modelo de regresión no lineal más preciso mediante el uso de algoritmos genéticos. La solución implementada se basa en la creación de cromosomas que representan coeficientes y exponentes para cada característica del conjunto de datos. Estos cromosomas son evaluados utilizando el error cuadrático medio (RMSE) como métrica de aptitud. El algoritmo genético itera sobre una población de cromosomas, aplicando operadores de selección por torneo, cruce y mutación, para optimizar los parámetros del modelo. El enfoque permite explorar de manera eficiente el espacio de búsqueda y ajustar los coeficientes y exponentes para minimizar el RMSE, mejorando así la capacidad del modelo de predecir futuros ejemplos.
+
+El documento está estructurado de la siguiente manera: Tras la introducción, en la Sección II se describen los fundamentos teóricos con los que se ha trabajado el algoritmo genético y la regresión no lineal. La Sección III detalla la metodología propuesta, incluyendo la representación de los cromosomas, los operadores genéticos utilizados y el proceso de evaluación de los modelos. En la Sección IV se presentan los experimentos realizados y los resultados obtenidos, destacando las ventajas y limitaciones del enfoque propuesto. Finalmente, en la Sección V se presentan las conclusiones y se sugieren posibles líneas de investigación futura.
 
 \section{Preliminares}
+~\label{sec: preliminares}
 
 En este trabajo, se busca aplicar la idea de los algoritmos genéticos para resolver problemas de regresión. Para ello, los cromosomas modelarán los parámetros de la función que intentamos predecir, y su valoración se realizará utilizando datos de prueba. Esto se llevará a cabo prediciendo los datos y evaluando la precisión de las predicciones comparándolas con los resultados esperados.
 
@@ -111,7 +104,7 @@ El modelado del cromosoma en nuestro caso incluye los siguientes aspectos:
 Aunque, a priori, todos los elementos de ambas listas no tienen restricciones en cuanto a los valores que pueden adoptar, existen dos situaciones que podrían limitar estos valores:
 
 
-1. \textbf{Variable \( x_i \) negativa:} En este caso, el exponente de la función no puede asumir valores fraccionarios cuyo denominador sea par, es decir, de la forma \( k/m \) donde \( m \) es par, en el ámbito de los números reales. A priori, este sería el único problema, pero obtenemos otro por la forma de trabajar de Python con las potencias fraccionarias: cualquier número negativo elevado a una potencia fraccionaria, ya sea con un denominador par o impar, resulta en un número complejo. Esto no es deseable, dado que estamos trabajando en el conjunto de los números reales \( \mathbb{R} \). Podemos ver este fallo de Python ejemplificado a continuación, donde se eleva un número negativo \( -1 \) a un número fraccionario con denominador impar \( 0.2 = \frac{1}{5} \), lo que resulta en la raíz quinta de \(-1\), que es igual a \(-1\):
+1. \textbf{Variable \( x_i \) negativa:} En este caso, el exponente de la función no puede asumir valores fraccionarios cuyo denominador sea par, es decir, de la forma \( k/m \) donde \( m \) es par, en el ámbito de los números reales. A priori, este sería el único problema, pero obtenemos otro por la forma de trabajar de Python con las potencias fraccionarias: cualquier número negativo elevado a una potencia fraccionaria, ya sea con un denominador par o impar, resulta en un número complejo. Esto no es deseable, dado que estamos trabajando en el conjunto de los números reales. Podemos ver este fallo de Python ejemplificado a continuación, donde se eleva un número negativo \( -1 \) a un número fraccionario con denominador impar \( 0.2 = \frac{1}{5} \), lo que resulta en la raíz quinta de \(-1\), que es igual a \(-1\):
 
 Esperado:
 \[
@@ -146,12 +139,14 @@ Lo único que se requiere es multiplicar este valor por la función signo de la 
 Esta solución ha proporcionado, además, los mejores resultados en nuestras pruebas.
 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{image-roots-example.jpg}
+    \includegraphics[width=\columnwidth]{image.png}
     \caption{Ejemplificación de las soluciones complejas a una raíz.}
     \label{fig:roots_example}
 \end{figure}
+
+Para una mejor comprensión sobre el manejo de números complejos en Python, se sugiere consultar el estudio mencionado en ~\cite{b3}.
 
 2. \textbf{Variable \( x_i \) igual a cero:} Aquí, el problema surge con los exponentes negativos, pues esta operación está indeterminada. Por tanto, para resolver este problema, utilizamos el valor absoluto del exponente, ya que al saber que la función a interpolar está definida en \( x_i = 0 \), podemos afirmar que \( e_j > 0 \).
 
@@ -183,17 +178,16 @@ Posteriormente, sumamos estos términos junto con un último coeficiente, que ac
 \subsubsection{Cruce de Cromosomas}
 El proceso de cruce de cromosomas tiene como objetivo combinar dos cromosomas parentales, eligiendo uno o varios puntos de cruce de manera aleatoria. Una vez determinado el o los puntos de cruce, se crean dos cromosomas hijos seleccionando distintas parte de cada cromosoma padre. 
 
-Consideramos la posibilidad de emplear uno o dos puntos de cruce en este proceso. Para tomar esta decisión, consultamos investigaciones previas sobre algoritmos genéticos (véase ~\cite{b1}). Sin embargo, finalmente llegamos a la conclusión de utilizar únicamente un punto de cruce. Esta elección se basa en nuestra consideración de que este enfoque se ajusta mejor a la documentación proporcionada y es una visión más sencilla y suficientemente eficaz para el problema a resolver.
+Consideramos la posibilidad de emplear uno o dos puntos de cruce en este proceso. Para tomar esta decisión, consultamos investigaciones previas sobre algoritmos genéticos (véase ~\cite{b1} y ~\cite{b2}). Sin embargo, finalmente llegamos a la conclusión de utilizar únicamente un punto de cruce. Esta elección se basa en nuestra consideración de que este enfoque se ajusta mejor a la documentación proporcionada y es una visión más sencilla y suficientemente eficaz para el problema a resolver.
 
 Para decidir cuándo realizar el cruce, se utiliza una tasa de cruce, la cual es un valor entre 0 y 1. Se elige un número aleatorio, también entre 0 y 1, y la probabilidad de que este número sea menor que la tasa de cruce es precisamente la tasa de cruce. Por lo tanto, si el número aleatorio es mayor que la tasa de cruce, los cromosomas se devuelven sin cambios. 
 
 En caso de que se deba realizar el cruce, se genera aleatoriamente un punto de corte en los cromosomas parentales. En este punto, ambos cromosomas se dividen y se combinan emparejando una mitad de uno con la mitad complementaria del otro, y viceversa. Podemos ver este proceso ejemplificado en \figurename~\ref{fig:chromosome-crossover}
 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]
-    {image-chromosome-crossover.jpg}
+    \includegraphics[width=\columnwidth]{image-chromosome-crossover.jpg}
     \caption{Proceso de cruce ilustrado.}
     \label{fig:chromosome-crossover}
 \end{figure}
@@ -237,7 +231,7 @@ Para aprovechar las ventajas de disponer de un gran número de datos de prueba y
 De esta manera, un cromosoma que progresa a través de distintas generaciones debido a su buen desempeño en los datos asignados, será evaluado con diferentes subconjuntos de datos en cada iteración. Esto no solo asegura una evaluación más robusta, sino que también reduce significativamente el costo computacional de valorar un cromosoma.
 
 
-\subsubsection{Almacenamiento de la Valoración de un Cromosoma}
+\subsubsection{Almacenamiento de la valoración de un cromosoma}
 Durante la ejecución del algoritmo genético, debemos ordenar todos los cromosomas de la población actual en función de su valoración. Estas valoraciones también se utilizan posteriormente en la selección por torneo.
 
 Inicialmente, la población se representaba como una lista de cromosomas, y el cálculo de la valoración se realizaba cada vez que era necesario obtener la valoración de un cromosoma. Este enfoque era extremadamente ineficiente.
@@ -247,37 +241,10 @@ Para mejorar la eficiencia, propusimos cambiar esta lista de cromosomas por una 
 
 \section{Metodología}
 
-Esta sección se dedica a la descripción del método implementado en el trabajo.
-Esta parte es la correspondiente a lo realmente desarrollado en el trabajo, y
-se puede emplear pseudocódigo (nunca código), esquemas, tablas, etc.
+Esta sección presenta los pseudocódigos de cada una de las funciones que se usan en el diseño del algoritmo genético, los cuales han sido explicados en el apartado \ref{sec: preliminares}.
 
-A continuación, un ejemplo de uso de listas numeradas:
-\begin{enumerate}
-\item\label{item:dos-alumnos} \textit{Trabajos con dos alumnos:} poner nombre y
-  apellidos completos de cada uno, y correos electrónicos de contacto (a ser
-  posible de la Universidad de Sevilla). El orden de los alumnos se fijará por
-  orden alfabético según los apellidos.
-\item \textit{Trabajo con un autor:} cambiar la cabecera de la siguiente manera
-  \begin{enumerate}
-  \item \textit{Una sola columna:} solo se debe especificar un alumno.
-  \item \textit{Información a añadir:} la misma que la especificada en el
-    punto~\ref{item:dos-alumnos}.
-  \end{enumerate}
-\end{enumerate}
 
-Las figuras se deben mencionar en el texto, como la
-\figurename~\ref{fig:ejemplo}. También se pueden añadir ecuaciones, como la
-ecuación~\eqref{eq:ejemplo}.
-
-\begin{equation}
-  \label{eq:ejemplo}
-  a + b = \gamma
-\end{equation}
-
-Un ejemplo de pseudocódigo se puede observar en la
-\figurename~\ref{pcd:fitness}.
-
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \begin{pseudo}*
     \hd{\fn{fitness}}(self, train\_data, data\_percentage) \\*
@@ -287,15 +254,15 @@ Un ejemplo de pseudocódigo se puede observar en la
     \multicolumn{2}{l}{ será entrenado el cromosoma} \\*
     \multicolumn{2}{l}{\textbf{Salida}: Un float que representa el error cuadrático medio} \\*
     \multicolumn{2}{l}{ (RMSE)} \\
-    \fn{y\_pred \(\leftarrow\) lista vacía} \\
-    \fn{y\_true \(\leftarrow\) lista vacía} \\
-    \fn{selected\_data \(\leftarrow\)} seleccionar aleatoriamente \\+
+    \fn{predicted \(\leftarrow\) lista vacía} \\
+    \fn{expected \(\leftarrow\) lista vacía} \\
+    \fn{subset \(\leftarrow\)} seleccionar aleatoriamente \\+
     \fn{(train\_data * data\_percentage) elementos de} \\+
     \fn{train\_data} \\--
-    \textbf{para cada} \fn{datum} \textbf{en} \fn{selected\_data} \textbf{hacer} \\+
-    agregar \fn{llamada a la funcion predict con datum} \\+ \fn{como parametro} a \fn{y\_pred} \\
-    agregar \fn{último elemento de datum} a \fn{y\_true} \\-
-    \fn {rmse} \(\leftarrow\) \fn{root\_mean\_squared\_error}(y\_true, y\_pred) \\
+    \textbf{para cada} \fn{datum} \textbf{en} \fn{subset} \textbf{hacer} \\+
+    agregar \fn{llamada a la funcion predict con datum} \\+ \fn{como parametro} a \fn{predicted} \\
+    agregar \fn{último elemento de datum} a \fn{expected} \\-
+    \fn {rmse} \(\leftarrow\) \fn{root\_mean\_squared\_error}(expected, predicted) \\
     \textbf{devolver} \fn{rmse}
   \end{pseudo}
   \caption{Función de evaluación del cromosoma (\texttt{fitness}) en pseudocódigo}
@@ -303,7 +270,7 @@ Un ejemplo de pseudocódigo se puede observar en la
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \begin{pseudo}*
     \hd{\fn{predict}}(\textit{self, datum}) \\*
@@ -311,18 +278,14 @@ Un ejemplo de pseudocódigo se puede observar en la
     \multicolumn{2}{l}{representa una línea de los datos de entrenamiento} \\*
     \multicolumn{2}{l}{\textbf{Salida}: Un float que representa el valor predicho} \\
     \fn{prediction \(\leftarrow\) 0} \\
-    \textbf{para cada} \fn{i} \textbf{en rango} \fn{len(datum) - 1} \textbf{hacer} \\+
-    \textbf{si} \fn{\textit{el dato recibido i}} es menor que \fn0
-    \textbf{entonces} \\+
-    \fn{\textit{el exponente i}} \(\leftarrow\) 
-    (redondear a entero \fn{\textit{el}}\\+
-    \fn{\textit{ exponente i}} \\--
-    \textbf{si no, si} \fn{\textit{el dato recibido i}} es igual que \fn0 \textbf{entonces} \\+
-    \textit{\fn{el exponente i}} \(\leftarrow\) \fn{hacer el valor absoluto} \\-
-    \fn{exponent \(\leftarrow\) \textit{el exponente i}} \\
-    \fn{prediction} \(\mathrel{+}= \textit{\fn{el coeficiente i}} \times \fn{\textit{(el dato recibido i }} \\+
-    \text{ elevado a} \fn{exponent)}\) \\--
-    \fn{prediction} \(\mathrel{+}= \textit{ \fn{el último coeficiente}}\) \\
+    \textbf{para cada} \fn{j} \textbf{en rango} \fn{len(datum) - 1} \textbf{hacer} \\+
+    
+    \textbf{si} \fn{\textit{el dato recibido j}} es igual que \fn0 \textbf{entonces} \\+
+    \textit{\fn{el exponente j}} \(\leftarrow\) \fn{hacer el valor absoluto} \\-
+    \fn{power\_term \(\leftarrow\) \textit{sign de datum j * modulo de }} \\+
+    \fn{(datum j ** exponente j)} \\-
+    \fn{prediction} \(\mathrel{+}= \textit{\fn{el coeficiente j}} \times \fn{\textit{power\_term }} \\-
+    \fn{prediction} \(\mathrel{+}= \textit{ \fn{término independiente}}\) \\
     \textbf{devolver} \fn{prediction}
   \end{pseudo}
   \caption{Función de predicción (\texttt{predict}) en pseudocódigo}
@@ -331,44 +294,43 @@ Un ejemplo de pseudocódigo se puede observar en la
 
 
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \begin{pseudo}*
-    \hd{\fn{crossover}}(\textit{self}, \textit{chromosomeToCrossWith}, \textit{cross\_rate}) \\*
-    \multicolumn{2}{l}{\textbf{Entrada}: El cromosoma actual, el cromosoma para cruzar y la} \\*
-    \multicolumn{2}{l}{ tasa de cruce} \\*
-    \multicolumn{2}{l}{\textbf{Salida}: Una lista de los dos cromosomas resultantes del cruce} \\
-    \textbf{si \fn{el número random generado} es mayor que } \textit{\fn{cross\_rate}} \\+
+    \hd{\fn{crossover}}(\textit{self}, \textit{ parent1, parent2}, \textit{cross\_rate}) \\*
+    \multicolumn{2}{l}{\textbf{Entrada}: Padre1, padre2 y la tasa de cruce} \\*
+    \multicolumn{2}{l}{\textbf{Salida}: Una lista de los dos cromosomas resultantes} \\
+    \textbf{si \fn{el número random generado} es mayor que} \textit{\fn{cross\_rate}} \\+
     \textbf{entonces} \\+
-    \textbf{devolver \fn{una lista con el cromosoma actual y el}} \\+
+    \textbf{devolver \fn{una lista con parent1 y parent2}} \\+
     \fn{cromosoma con el que iba a ser cruzado} \\---
-    \fn{punto} \(\leftarrow\) \fn{número random entre el uno y la longitud de } \\+
-    \fn{la lista de exponentes menos uno} \\---
+    \fn{point} \(\leftarrow\) \fn{número random entre el uno y la longitud de } \\+
+    \fn{la lista de exponentes de parent1 menos uno} \\---
     \fn{child1\_coefficients} \(\leftarrow\)
-    \textit{\fn{los coeficientes del cromosoma actual}} \\+ 
-    \textit{\fn{hasta "punto" + los coeficientes del cromosoma a cruzar}} \\+
-     \textit{\fn{desde "punto"}} \\--
-    \fn{child2\_coefficients} \(\leftarrow\) \textit{\fn{los coeficientes del cromosoma a cruzar}} \\+ 
-    \textit{\fn{hasta "punto" + los coeficientes del cromosoma actual}} \\+
-     \textit{\fn{desde "punto"}} \\--
+    \textit{\fn{los coeficientes}} \\+ 
+    \textit{\fn{de parent1 hasta "punto" + los coeficientes de }} \\+
+     \textit{\fn{parent2 desde "punto"}} \\--
     \fn{child1\_exponents} \(\leftarrow\)
-    \textit{\fn{los exponentes del cromosoma actual}} \\+ 
-    \textit{\fn{hasta "punto" + los exponentes del cromosoma a cruzar}} \\+
-     \textit{\fn{desde "punto"}} \\--
+    \textit{\fn{los exponentes de parent1}} \\+ 
+    \textit{\fn{ hasta "punto" + los exponentes de }} \\+
+     \textit{\fn{parent2 desde "punto"}} \\--
+     \fn{child2\_coefficients} \(\leftarrow\) \textit{\fn{los coeficientes de parent2}} \\+ 
+    \textit{\fn{ hasta "punto" + los coeficientes de }} \\+
+     \textit{\fn{parent1 desde "punto"}} \\--
     \fn{child2\_exponents} \(\leftarrow\)
-    \textit{\fn{los exponentes del cromosoma a cruzar}} \\+ 
-    \textit{\fn{hasta "punto" + los exponentes del cromosoma actual}} \\+
-     \textit{\fn{desde "punto"}} \\--
+    \textit{\fn{los exponentes de parent2}} \\+ 
+    \textit{\fn{ hasta "punto" + los exponentes de }} \\+
+     \textit{\fn{parent1 desde "punto"}} \\--
     \textbf{devolver} \fn{lista con el cromosoma child1\_coefficients} \\+
-    \fn{y child1\_exponents, y el cromosoma child2\_coefficients} \\+
-    \fn{ y child2\_exponents}
+    \fn{y child1\_exponents, y el cromosoma } \\+
+    \fn{child2\_coefficients y child2\_exponents}
   \end{pseudo}
   \caption{Función de cruza (\texttt{crossover}) en pseudocódigo}
   \label{pcd:crossover}
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \begin{pseudo}*
     \hd{\fn{mutate}}(\textit{self}, \textit{mutation\_rate}, \textit{mutation\_range}) \\*
@@ -379,11 +341,11 @@ Un ejemplo de pseudocódigo se puede observar en la
     \textbf{si} \textit{\fn{random\_number} es menor que}  \textit{\fn{mutation\_rate}} \textbf{entonces} \\+
         \textbf{para cada} \textit{\fn{i}} \textbf{en rango} \fn{longitud de la lista de exponentes} \\+
         \fn{ del cromosoma actual }\textbf{hacer} \\+
-            \textit{\fn{coeficiente i del cromosoma actual}} \(\mathrel{+}= \fn{un valor}\\+
-            \fn{aleatorio entre -mutation\_range y} \\+ \fn{mutation\_range}\) \\--
-            \textit{\fn{exponente i del cromosoma actual}} \(\mathrel{+}= \fn{un valor}\\+
-            \fn{aleatorio entre -mutation\_range y} \\+ \fn{mutation\_range}\) \\----
-        \textit{\fn{último coeficiente del cromosoma actual}} \\mathrel{+}= \fn{un valor}\\+
+            \textit{\fn{coeficiente i del cromosoma actual}}  \fn{ += un valor}\\+
+            \fn{aleatorio entre -mutation\_range y} \\+ \fn{mutation\_range}\ \\--
+            \textit{\fn{exponente i del cromosoma actual}} \fn{ += un valor}\\+
+            \fn{aleatorio entre -mutation\_range y} \\+ \fn{mutation\_range}\ \\----
+        \textit{\fn{último coeficiente del cromosoma actual}} \fn{+= un valor}\\+
             \fn{aleatorio entre -mutation\_range y mutation\_range}\\--
   \end{pseudo}
   \caption{Función de mutación (\texttt{mutate}) en pseudocódigo}
@@ -391,8 +353,39 @@ Un ejemplo de pseudocódigo se puede observar en la
 \end{figure}
 
 
+\begin{figure}[H]
+  \centering
+  \begin{pseudo}*
+    \hd{\fn{tournament\_selection}}(\textit{self}, \textit{k}) \\*
+    \multicolumn{2}{l}{\textbf{Entrada}: Instancia de la clase AG y número de cromosomas} \\*
+    \multicolumn{2}{l}{seleccionados para el torneo (\textit{k})} \\*
+    \multicolumn{2}{l}{\textbf{Salida}: Cromosoma con la mejor aptitud} \\
+    \textit{\fn{tournament}} \(\leftarrow\) \fn{k elementos aleatorios de población actual}\\---
+    \textbf{devolver} \textit{\fn{ elemento con menor fitness}} \\
+  \end{pseudo}
+  \caption{Selección de torneo en pseudocódigo}
+  \label{pcd:tournament_selection}
+\end{figure}
 
-\begin{figure}[h]
+
+
+
+\begin{figure}[H]
+  \centering
+  \begin{pseudo}*
+    \hd{\fn{test}}(\textit{self}, \textit{chromosome}) \\*
+    \multicolumn{2}{l}{\textbf{Entrada}: Instancia de la clase AG y cromosoma a probar} \\*
+    \multicolumn{2}{l}{\textbf{Salida}: Lista de valores predichos} \\
+    \textbf{devolver} \textit{\fn{[predicción \textbf{de} dato \textbf{por} dato \textbf{en} conjunto de test]}} \\
+  \end{pseudo}
+  \caption{Función de prueba (\texttt{test}) en pseudocódigo}
+  \label{pcd:test}
+\end{figure}
+
+
+
+
+\begin{figure}[H]
   \centering
   \begin{pseudo}*
     \hd{\fn{run}}(\textit{self}) \\*
@@ -404,7 +397,8 @@ Un ejemplo de pseudocódigo se puede observar en la
     \textit{\fn{población}}\\--
     \textbf{para} \textit{\fn{generation}} \textbf{en rango} \textit{\fn{máximas iteraciones}} \textbf{hacer} \\+
     \textbf{para} \textit{\fn{pair}} \textbf{en} \textit{\fn{la población actual}} \textbf{hacer} \\+
-        \textit{\fn{self.population}} \(\leftarrow\) \\text{\fn{lista de listas del primer}} \\+
+        \textit{\fn{self.population}} \(\leftarrow\) 
+        \fn{lista de listas del primer} \\+
         \fn{elemento de pair y de su función fitness} \\--
         \textit{\fn{self.population}} \(\leftarrow\) 
         \fn{se ordena por el segundo}\\+
@@ -412,13 +406,14 @@ Un ejemplo de pseudocódigo se puede observar en la
         \fn{población} \\--
         \textbf{para} \textit{\fn{pair}} \textbf{en} \textit{\fn{la población actual hasta el}} \\+
         \fn{elitism\_count elemento} \textbf{hacer} \\+
-        \textit{\fn{next\_generation}} \(\leftarrow\) \\text{\fn{añadir el primer}} \\+
+        \textit{\fn{next\_generation}} \(\leftarrow\) \fn{añadir el primer} \\+
         \fn{elemento de pair} \\---
         \textbf{mientras} \fn{longitud de}
         \textit{\fn{next\_generation} menor que} \\+
         \textit{\fn{tamaño de población}} \textbf{hacer} \\+
-            \fn{\textit{parent1}, \textit{parent2}} \(\leftarrow\) \fn{cromosoma ganador del} \\+
-            \fn{\textit{torneo}, \textit{cromosoma ganador del torneo}} \\-
+            \fn{\textit{parent1}, \textit{parent2}} \(\leftarrow\) \fn{cromosoma ganador} \\+
+            \fn{\textit{del torneo} \textit{cromosoma ganador del}} \\+
+            \textit{torneo} \\--
             \textit{\fn{offspring}} \(\leftarrow\) \textit{\fn{crossover entre parent 1 y 2}}\\
             \textbf{para cada} \textit{\fn{child}} \textbf{en} \textit{\fn{offspring}} \textbf{hacer} \\+
                 \textbf{si} \fn{longitud de next\_generation} menor\\+
@@ -436,44 +431,6 @@ Un ejemplo de pseudocódigo se puede observar en la
   \caption{Función de ejecución (\texttt{run}) en pseudocódigo}
   \label{pcd:run}
 \end{figure}
-
-
-\begin{figure}[h]
-  \centering
-  \begin{pseudo}*
-    \hd{\fn{tournament\_selection}}(\textit{self}, \textit{k}) \\*
-    \multicolumn{2}{l}{\textbf{Entrada}: Instancia de la clase AG y número de cromosomas} \\*
-    \multicolumn{2}{l}{seleccionados para el torneo (\textit{k})} \\*
-    \multicolumn{2}{l}{\textbf{Salida}: Cromosoma con la mejor aptitud} \\
-    \textit{\fn{tournament}} \(\leftarrow\) \fn{k elementos aleatorios de población actual}\\--
-    \textit{\fn{sorted\_tournament}} \(\leftarrow\) 
-        \fn{se ordena por el segundo}\\+
-        \fn{elemento de cada tupla de la lista de población}\\--
-    \textbf{devolver} \textit{\fn{primer elemento de sorted\_torunament}} \\
-  \end{pseudo}
-  \caption{Selección de torneo en pseudocódigo}
-  \label{pcd:tournament_selection}
-\end{figure}
-
-
-
-
-\begin{figure}[h]
-  \centering
-  \begin{pseudo}*
-    \hd{\fn{test}}(\textit{self}, \textit{chromosome}) \\*
-    \multicolumn{2}{l}{\textbf{Entrada}: Instancia de la clase AG y cromosoma a probar} \\*
-    \multicolumn{2}{l}{\textbf{Salida}: Lista de valores predichos} \\
-    \textit{\fn{y\_pred\(\leftarrow\) lista vacía}} \\--
-    \textbf{para cada} \textit{\fn{datum}} \textbf{en} \textit{\fn{test\_data}} \textbf{hacer} \\+
-        \textit{\fn{predicted \(\leftarrow\) \textit{predict datum}}} \\
-        \textit{\fn{y\_pred \(\leftarrow\) \textit{añadir predicted}}} \\--
-    \textbf{devolver} \textit{\fn{y\_pred}} \\
-  \end{pseudo}
-  \caption{Función de prueba (\texttt{test}) en pseudocódigo}
-  \label{pcd:test}
-\end{figure}
-
 
 
 
@@ -503,7 +460,7 @@ Es importante destacar que, aunque varios procesos dentro del algoritmo, como la
 
 Los parámetros que influyen en los posibles resultados del modelo son los siguientes: tamaño de la población de cromosomas, número de iteraciones (aunque otra forma de limitar el proceso podría ser alcanzar un RMSE determinado o un tiempo máximo especificado), tasa de mutación, rango de mutación (el intervalo en el que se encuentra el valor que se va a sumar o restar a las posiciones del cromosoma), rango de valores iniciales, tasa de cruce y tasa de elitismo. En nuestro estudio, los valores seleccionados para estos parámetros son:
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \caption{Parámetros del modelo y sus valores.}
 \label{tab:parametros}
@@ -525,14 +482,24 @@ Tasa de elitismo               & 0.2 \\
 
 Es importante destacar que todos estos parámetros pueden afectar de manera tanto positiva como negativa a los resultados obtenidos. Lo que puede ser beneficioso para un conjunto de datos podría resultar perjudicial para otro. Por este motivo, hemos seleccionado valores que buscamos que sean adecuados para todos los conjuntos de datos empleados. No obstante, se recomienda ajustar estos parámetros según sea necesario para optimizar los resultados en un conjunto de datos específico. Estos parámetros pueden ser establecidos al crear la instancia del \texttt{AG} mediante los \texttt{**kwargs} del constructor.
 
-Con los parámetros establecidos, los mejores resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados}. El tiempo del algoritmo depende de, entre otras cosas, el equipo en el que se prueba (tanto hardware como software); en nuestro caso lo hemos probado en:
+El tiempo del algoritmo depende de, entre otras cosas, el equipo en el que se prueba (tanto hardware como software); en nuestro caso lo hemos probado en dos sistemas, estos son:
+\textbf{Sistema 1}
 \begin{itemize}
     \item \textbf{CPU}: \textit{AMD Ryzen 7 7000 Series}
-    \item \textbf{GPU}: \textit{GPU incorporada en el procesador}
     \item \textbf{Sistema operativo}: \textit{Linux Fedora}
-    \item \textbf{Terminal}: \textit{Warp} (Recomendamos lanzarlo desde una terminal lo más optimizada posible, en lugar de la incorporada en un IDE).
-    
+    \item \textbf{Terminal}: \textit{Warp}
 \end{itemize}
+
+
+\textbf{Sistema 2}
+\begin{itemize}
+    \item \textbf{CPU}: \textit{Intel i7 10510U}
+    \item \textbf{Sistema operativo}: \textit{Windows 11}
+    \item \textbf{Terminal}: \textit{Powershell}
+\end{itemize}
+Recomendamos lanzarlo desde una terminal lo más optimizada posible, en lugar de la incorporada en un IDE.
+
+Con los parámetros establecidos, los resultados obtenidos para cada fichero se presentan en la Tabla~\ref{tab:resultados1} para el primer sistema y en la Tabla ~\ref{tab:resultados2} para el segundo. 
 
 Además, hemos implementado un sistema de registros que, de manera dinámica, actualiza los mejores valores obtenidos a medida que se prueban distintos parámetros o se cambian las semillas. Este registro puede consultarse en \textit{./data/log.txt}, partiendo del directorio raíz del proyecto una vez descomprimido.
 
@@ -547,9 +514,9 @@ Para ejecutar el proyecto, ofrecemos dos opciones:
 Para cualquier duda sobre la instalación de dependencias o la configuración correcta del proyecto, consulte el archivo \textit{README.md} incluido en el directorio raíz del proyecto.
 
 
-\begin{table} [h]
-  \caption{Resultados obtenidos}
-  \label{tab:resultados}
+\begin{table} [H]
+  \caption{Resultados obtenidos sistema 1}
+  \label{tab:resultados1}
   \centering
   \begin{tabular}{cccc}
     \toprule
@@ -559,6 +526,23 @@ Para cualquier duda sobre la instalación de dependencias o la configuración co
     R2 & 0.9436 & 0.5739 & -0.0474 \\
     \midrule
     Tiempo & 8.32 & 20.61 & 160.97 \\
+    Seed & 123 & 124 & 123 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table} [H]
+  \caption{Resultados obtenidos sistema 2}
+  \label{tab:resultados1}
+  \centering
+  \begin{tabular}{cccc}
+    \toprule
+     Fichero & Toy1 & Housing & Synt1 \\
+    \midrule
+    RMSE & 0.3517 & 0.7564 & 190.8364 \\
+    R2 & 0.9403 & 0.5739 & -0.0474 \\
+    \midrule
+    Tiempo & 16.29 & 49.65 & 487.17 \\
     Seed & 123 & 124 & 123 \\
     \bottomrule
   \end{tabular}
@@ -574,19 +558,14 @@ Los experimentos demostraron que el tiempo de entrenamiento varía según el tam
 Para futuros trabajos, se sugiere una serie de mejoras y exploraciones adicionales. Entre estas mejoras, la paralelización de partes del código podría mejorar significativamente el rendimiento del algoritmo genético. La optimización de parámetros del algoritmo genético, como las tasas de mutación y cruce, y la incorporación de métodos avanzados de selección también podría conducir a mejoras adicionales en la precisión y eficiencia del modelo. Finalmente, sería beneficioso explorar la aplicación de este enfoque en otros dominios y con conjuntos de datos más grandes y complejos para validar su generalizabilidad y robustez.
 
 
-
 \begin{thebibliography}{00}
 \bibitem{b1}Mathew, Tom V. "Genetic algorithm." Report submitted at IIT Bombay 53 (2012), pp 7-8.
 
+\bibitem{b2}Pose, Marcos Gestal. "Introducción a los algoritmos genéticos." Departamento de Tecnologías de la Información y las Comunicaciones Universidad de Coruña (2000).
 
-A partir de aqui son los de ejemplo
-\bibitem{b} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
-\bibitem{b} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-\bibitem{b} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-\bibitem{b} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
+\bibitem{b3}van Rossum, G., and Drake, F. L. (Eds.). (2006). An introduction to Python. Network Theory Limited, pp 15-18.
+
+\bibitem{b4}https://scsynth.org/t/fractional-powers-of-negative-numbers/4224
 \end{thebibliography}
 
 

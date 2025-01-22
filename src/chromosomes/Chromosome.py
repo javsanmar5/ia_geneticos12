@@ -109,7 +109,7 @@ class Chromosome(AbstractChromosome):
 
     @staticmethod
     def crossover(parent1: 'Chromosome', parent2: 'Chromosome', 
-                  cross_rate: float,) -> List['Chromosome']:
+                  cross_rate: float) -> List['Chromosome']:
         # Generamos un número aleatorio entre 0 y 1, y la probabilidad de que
         # este número sea menor que la tasa de cruce es la propia tasa de cruce.
 
